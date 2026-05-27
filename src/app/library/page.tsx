@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { Sidebar, type LibraryFilter } from '@/components/layout/Sidebar';
 import { GlassPanel } from '@/components/ui';
+import { DoodleSpiral, DoodleCircles } from '@/components/ui/SketchMarks';
 import { useLibrary, useCollections } from '@/hooks/useLibrary';
 import {
   libraryStore,
@@ -125,11 +126,9 @@ export default function LibraryPage() {
 
       <main className="overflow-y-auto p-7 md:px-9 md:py-7 pb-16 relative">
         {/* Decorative spiral doodle */}
-        <img
-          src="/assets/doodle-spiral.svg"
-          alt=""
-          aria-hidden="true"
-          className="absolute top-[30px] right-[110px] w-[70px] opacity-70 pointer-events-none hidden md:block"
+        <DoodleSpiral
+          className="absolute top-[30px] right-[110px] w-[70px] pointer-events-none hidden md:block text-[var(--color-terra-500)]"
+          decorOpacity={0.7}
         />
 
         {/* ─── TOPBAR ──────────────────────────────────────────────────── */}
@@ -274,11 +273,9 @@ export default function LibraryPage() {
 function EmptyLibrary() {
   return (
     <div className="flex flex-col items-center justify-center text-center py-20 max-w-[480px] mx-auto">
-      <img
-        src="/assets/doodle-circles.svg"
-        alt=""
-        aria-hidden="true"
-        className="h-[60px] opacity-50 mb-6"
+      <DoodleCircles
+        className="h-[60px] mb-6 text-[var(--color-ink-500)]"
+        decorOpacity={0.5}
       />
       <h2
         style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}

@@ -8,6 +8,7 @@ import { DownloadComplete } from '@/components/features/DownloadComplete';
 import { ErrorDisplay } from '@/components/features/ErrorDisplay';
 import { FetchingState } from '@/components/features/FetchingState';
 import { StickyNote } from '@/components/ui';
+import { SketchArrow, SketchStar, DoodleSpiral, DoodleCircles } from '@/components/ui/SketchMarks';
 import { useRetryState } from '@/hooks/useRetryState';
 import { libraryStore } from '@/lib/library-store';
 import type { AppState, DetectResponse, FetchResponse, VideoQuality } from '@/types';
@@ -230,10 +231,20 @@ export default function Home() {
           HERO
           ════════════════════════════════════════════════════════════════ */}
       <section className="relative max-w-[1280px] mx-auto px-6 md:px-12 pt-12 md:pt-20 pb-16">
-        {/* Decorations */}
-        <img src="/assets/sketch-star.svg" alt="" aria-hidden="true" className="absolute top-16 right-[200px] w-[38px] pointer-events-none hidden md:block" style={{ transform: 'rotate(12deg)' }} />
-        <img src="/assets/doodle-spiral.svg" alt="" aria-hidden="true" className="absolute top-[240px] right-[280px] w-[70px] opacity-60 pointer-events-none hidden lg:block" />
-        <img src="/assets/sketch-arrow.svg" alt="" aria-hidden="true" className="absolute top-[180px] right-[40px] w-[120px] opacity-80 pointer-events-none hidden lg:block" style={{ transform: 'rotate(-10deg)' }} />
+        {/* Decorations — themeable inline SVG marks (use currentColor) */}
+        <SketchStar
+          className="absolute top-16 right-[200px] w-[38px] pointer-events-none hidden md:block text-[var(--color-terra-500)]"
+          style={{ transform: 'rotate(12deg)' }}
+        />
+        <DoodleSpiral
+          className="absolute top-[240px] right-[280px] w-[70px] pointer-events-none hidden lg:block text-[var(--color-terra-500)]"
+          decorOpacity={0.6}
+        />
+        <SketchArrow
+          className="absolute top-[180px] right-[40px] w-[120px] pointer-events-none hidden lg:block text-[var(--color-ink-700)]"
+          style={{ transform: 'rotate(-10deg)' }}
+          decorOpacity={0.8}
+        />
 
         {/* Sticky notes */}
         <div className="hidden xl:block absolute top-[120px] right-[80px]">
@@ -370,12 +381,10 @@ export default function Home() {
 
                 {/* Hand-drawn arrow between steps */}
                 {i < 2 && (
-                  <img
-                    src="/assets/sketch-arrow.svg"
-                    alt=""
-                    aria-hidden="true"
-                    className="hidden md:block absolute top-[12px] -right-8 w-[64px] opacity-70"
+                  <SketchArrow
+                    className="hidden md:block absolute top-[12px] -right-8 w-[64px] text-[var(--color-ink-700)]"
                     style={{ transform: i === 0 ? 'rotate(-6deg)' : 'rotate(4deg)' }}
+                    decorOpacity={0.7}
                   />
                 )}
               </div>
@@ -390,7 +399,10 @@ export default function Home() {
       {isIdle && (
         <section className="max-w-[1280px] mx-auto px-6 md:px-12 py-16 md:py-24 text-center">
           <div className="max-w-[760px] mx-auto">
-            <img src="/assets/doodle-circles.svg" alt="" aria-hidden="true" className="h-[50px] opacity-50 mb-5 mx-auto" />
+            <DoodleCircles
+              className="h-[50px] mb-5 mx-auto text-[var(--color-ink-500)]"
+              decorOpacity={0.5}
+            />
             <blockquote
               style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
               className="text-[clamp(28px,4vw,42px)] leading-[1.18] text-[var(--color-ink-900)] m-0 text-balance"
