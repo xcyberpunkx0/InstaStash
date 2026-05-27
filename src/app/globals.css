@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  /* Sketchbook Theme Colors */
+  --color-background: #FFF8F0;
+  --color-surface: #FFFDF9;
+  --color-primary: #BF5540;
+  --color-secondary: #7BB5A3;
+  --color-accent: #F4C06F;
+  --color-text: #3D3229;
+  --color-text-muted: #756558;
+  --color-error: #C04038;
+  --color-success: #6BA87B;
+  --color-border: #C4B5A4;
+
+  /* Fonts */
+  --font-heading: 'Caveat', cursive;
+  --font-body: 'Nunito', sans-serif;
+
+  /* Border Radius */
+  --radius-sketch: 4px;
+
+  /* Animation Durations */
+  --animate-micro: 200ms ease-in-out;
+  --animate-standard: 300ms ease-in-out;
+  --animate-slow: 400ms ease-in-out;
+
+  /* Breakpoints */
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+}
+
+/* Base styles */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Focus-visible styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sketch);
+}
+
+/* Remove default focus outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip to content link (hidden until focused) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 8px 16px;
+  z-index: 100;
+  font-family: var(--font-body);
+  font-size: 14px;
+  border-radius: var(--radius-sketch);
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 8px;
+  left: 8px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .skip-link {
+    transition: none;
+  }
+}

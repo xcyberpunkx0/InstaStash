@@ -1,0 +1,36 @@
+{
+  "name": "video-downloader-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "next": "^16.2.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "rough-notation": "^0.5.1",
+    "roughjs": "^4.6.6",
+    "youtube-dl-exec": "^3.0.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.4.0",
+    "fast-check": "^4.0.0",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
+  }
+}
