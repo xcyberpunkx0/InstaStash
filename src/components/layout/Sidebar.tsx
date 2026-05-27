@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useLibrary, useCollections } from '@/hooks/useLibrary';
 import { collectionsStore, isAudioItem } from '@/lib/library-store';
+import { Logo } from '@/components/ui/Logo';
+import { ThemePicker } from '@/components/ThemeSwitcher';
 
 // ─── Filter type — drives both sidebar selection and library grid ────────
 
@@ -103,13 +106,51 @@ function Icon({ name }: { name: string }) {
 export interface SidebarProps {
   filter: LibraryFilter;
   onFilterChange: (filter: LibraryFilter) => void;
+  /** Mobile drawer open state */
+  mobileOpen?: boolean;
+  /** Called when the user dismisses the mobile drawer */
+  onMobileClose?: () => void;
 }
 
-export function Sidebar({ filter, onFilterChange }: SidebarProps) {
+export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileClose }: SidebarProps) {
   const items = useLibrary();
   const collections = useCollections();
   const [creatingNew, setCreatingNew] = useState(false);
   const [newName, setNewName] = useState('');
+
+  const drawerRef = useRef<HTMLElement | null>(null);
+
+  // ─── Mobile drawer UX plumbing ──────────────────────────────────────────
+  // 1) Body scroll lock so the page behind doesn't scroll under the sheet.
+  // 2) ESC dismisses the drawer.
+  // 3) Focus is moved into the drawer when it opens, restored to the
+  //    previously-focused element on close (typical sheet pattern).
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    // Lock scroll
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Send focus into the drawer on open, after the slide animation begins
+    const t = window.setTimeout(() => {
+      drawerRef.current?.focus();
+    }, 60);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onMobileClose?.();
+    };
+    window.addEventListener('keydown', onKey);
+
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = original;
+      previouslyFocused?.focus?.();
+    };
+  }, [mobileOpen, onMobileClose]);
 
   // Real counts
   const counts = useMemo(() => {
@@ -134,45 +175,59 @@ export function Sidebar({ filter, onFilterChange }: SidebarProps) {
     return { everything, recent, video, audio, perCollection };
   }, [items]);
 
+  // Auto-close the mobile drawer when the filter changes (after a tap on a nav item).
+  const handleFilterChange = (next: LibraryFilter) => {
+    onFilterChange(next);
+    if (mobileOpen) onMobileClose?.();
+  };
+
   const handleCreate = () => {
     const c = collectionsStore.create(newName);
     setNewName('');
     setCreatingNew(false);
-    if (c) onFilterChange({ kind: 'collection', id: c.id });
+    if (c) handleFilterChange({ kind: 'collection', id: c.id });
   };
 
   const handleDeleteCollection = (id: string) => {
     if (!confirm('Delete this collection? Videos in it will stay in your library.')) return;
     collectionsStore.remove(id);
     if (filter.kind === 'collection' && filter.id === id) {
-      onFilterChange({ kind: 'everything' });
+      handleFilterChange({ kind: 'everything' });
     }
   };
 
   const isActive = (target: LibraryFilter) => filterEquals(filter, target);
 
-  return (
-    <aside className="
-      bg-[rgba(247,243,238,0.7)] backdrop-blur-[14px] backdrop-saturate-[1.04]
-      border-r border-[var(--color-line-soft)]
-      p-[22px_18px] flex flex-col gap-2
-      relative
-      hidden lg:flex
-      overflow-y-auto
-    ">
-      {/* Wavy hand-drawn border on right edge */}
+  // ─── Inner content shared between desktop sidebar and mobile drawer ─────
+  const inner = (
+    <>
+      {/* Wavy hand-drawn border on right edge — desktop only */}
       <div
-        className="absolute right-0 top-0 bottom-0 w-px"
+        className="absolute right-0 top-0 bottom-0 w-px hidden lg:block"
         style={{
           backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1000' preserveAspectRatio='none'><path d='M0.5 0 C 0.2 100, 0.8 200, 0.5 300 S 0.2 500, 0.5 600 0.8 800, 0.5 1000' stroke='%231F1B16' stroke-opacity='0.18' fill='none' stroke-width='1' stroke-linecap='round'/></svg>")`,
           backgroundSize: '100% 100%',
         }}
       />
 
-      {/* Brand */}
-      <a href="/" className="flex items-center gap-2.5 px-2 pt-1.5 pb-[18px]">
-        <img src="/assets/logo.svg" alt="AuraVault" className="h-[30px]" />
-      </a>
+      {/* Brand + theme picker + close (mobile only) */}
+      <div className="flex items-center justify-between gap-2 px-2 pt-1.5 pb-[18px]">
+        <a href="/" className="flex items-center gap-2.5 text-[var(--color-ink-900)]" aria-label="AuraVault home">
+          <Logo className="h-[30px]" />
+        </a>
+        <div className="flex items-center gap-1">
+          <ThemePicker align="top-left" />
+          {/* Mobile-only close button */}
+          <button
+            type="button"
+            onClick={onMobileClose}
+            aria-label="Close menu"
+            className="lg:hidden inline-flex w-9 h-9 items-center justify-center rounded-full text-[var(--color-ink-700)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+      </div>
 
       {/* Library section */}
       <SectionLabel>Library</SectionLabel>
@@ -181,28 +236,28 @@ export function Sidebar({ filter, onFilterChange }: SidebarProps) {
         label="Everything"
         count={counts.everything}
         active={isActive({ kind: 'everything' })}
-        onClick={() => onFilterChange({ kind: 'everything' })}
+        onClick={() => handleFilterChange({ kind: 'everything' })}
       />
       <NavItem
         icon={<Icon name="clock" />}
         label="Recent"
         count={counts.recent}
         active={isActive({ kind: 'recent' })}
-        onClick={() => onFilterChange({ kind: 'recent' })}
+        onClick={() => handleFilterChange({ kind: 'recent' })}
       />
       <NavItem
         icon={<Icon name="film" />}
         label="Video"
         count={counts.video}
         active={isActive({ kind: 'video' })}
-        onClick={() => onFilterChange({ kind: 'video' })}
+        onClick={() => handleFilterChange({ kind: 'video' })}
       />
       <NavItem
         icon={<Icon name="music" />}
         label="Audio"
         count={counts.audio}
         active={isActive({ kind: 'audio' })}
-        onClick={() => onFilterChange({ kind: 'audio' })}
+        onClick={() => handleFilterChange({ kind: 'audio' })}
       />
 
       {/* Collections */}
@@ -234,7 +289,7 @@ export function Sidebar({ filter, onFilterChange }: SidebarProps) {
           label={c.name}
           count={counts.perCollection.get(c.id) ?? 0}
           active={isActive({ kind: 'collection', id: c.id })}
-          onClick={() => onFilterChange({ kind: 'collection', id: c.id })}
+          onClick={() => handleFilterChange({ kind: 'collection', id: c.id })}
           onDelete={() => handleDeleteCollection(c.id)}
         />
       ))}
@@ -271,6 +326,66 @@ export function Sidebar({ filter, onFilterChange }: SidebarProps) {
           your library lives in this browser. clear site data and it&rsquo;s gone. the videos themselves stay in your downloads folder.
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible from lg up */}
+      <aside className="
+        hidden lg:flex
+        bg-[var(--color-bg-glass)] backdrop-blur-[14px] backdrop-saturate-[1.04]
+        border-r border-[var(--color-line-soft)]
+        p-[22px_18px] flex-col gap-2
+        relative
+        overflow-y-auto
+      ">
+        {inner}
+      </aside>
+
+      {/* Mobile drawer — animated overlay + slide-in panel */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <div className="lg:hidden">
+            {/* Backdrop — fades, click-out dismisses */}
+            <motion.div
+              key="backdrop"
+              onClick={onMobileClose}
+              aria-hidden="true"
+              className="fixed inset-0 z-40 bg-[rgba(31,27,22,0.45)]"
+              initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+              animate={{ opacity: 1, backdropFilter: 'blur(3px)' }}
+              exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+              transition={{ duration: 0.18, ease: [0.22, 0.61, 0.36, 1] }}
+            />
+
+            {/* Drawer — slides in from the left */}
+            <motion.aside
+              key="drawer"
+              ref={drawerRef as React.RefObject<HTMLElement>}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Library navigation"
+              tabIndex={-1}
+              className="
+                fixed left-0 top-0 bottom-0 z-50
+                w-[300px] max-w-[88vw]
+                bg-[var(--color-bg-canvas)]
+                border-r border-[var(--color-line-soft)]
+                shadow-[0_28px_80px_-24px_rgba(31,27,22,0.55)]
+                p-[18px_14px] flex flex-col gap-2
+                overflow-y-auto outline-none
+              "
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
+            >
+              {inner}
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

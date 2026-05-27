@@ -8,6 +8,8 @@ import { DownloadComplete } from '@/components/features/DownloadComplete';
 import { ErrorDisplay } from '@/components/features/ErrorDisplay';
 import { FetchingState } from '@/components/features/FetchingState';
 import { StickyNote } from '@/components/ui';
+import { Logo } from '@/components/ui/Logo';
+import { ThemePicker } from '@/components/ThemeSwitcher';
 import { SketchArrow, SketchStar, DoodleSpiral, DoodleCircles } from '@/components/ui/SketchMarks';
 import { useRetryState } from '@/hooks/useRetryState';
 import { libraryStore } from '@/lib/library-store';
@@ -207,24 +209,27 @@ export default function Home() {
     <main id="main-content" className="min-h-screen">
       {/* Minimal nav — logo + library link */}
       <header className="max-w-[1280px] mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
-        <a href="/" className="inline-flex items-center gap-2.5">
-          <img src="/assets/logo.svg" alt="AuraVault" className="h-8" />
+        <a href="/" className="inline-flex items-center gap-2.5 text-[var(--color-ink-900)]" aria-label="AuraVault">
+          <Logo className="h-8" />
         </a>
-        <a
-          href="/library"
-          className="
-            inline-flex items-center gap-2
-            px-4 py-2 rounded-pill
-            bg-transparent border border-line-medium
-            text-ink-700 no-underline
-            font-grotesk font-medium text-[13px]
-            hover:bg-(--color-paper-200)
-            transition-colors duration-160
-          "
-        >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v1.5"/><path d="M13.9 17.45c-1.2-1.2-1.14-2.8-.2-3.73a2.43 2.43 0 0 1 3.44 0l.36.34.34-.34a2.43 2.43 0 0 1 3.45-.01v0c.95.95 1 2.53-.2 3.74L17.5 21Z"/></svg>
-          your library
-        </a>
+        <div className="flex items-center gap-2">
+          <ThemePicker align="top-left" />
+          <a
+            href="/library"
+            className="
+              inline-flex items-center gap-2
+              px-4 py-2 rounded-pill
+              bg-transparent border border-line-medium
+              text-ink-700 no-underline
+              font-grotesk font-medium text-[13px]
+              hover:bg-(--color-paper-200)
+              transition-colors duration-160
+            "
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v1.5"/><path d="M13.9 17.45c-1.2-1.2-1.14-2.8-.2-3.73a2.43 2.43 0 0 1 3.44 0l.36.34.34-.34a2.43 2.43 0 0 1 3.45-.01v0c.95.95 1 2.53-.2 3.74L17.5 21Z"/></svg>
+            your library
+          </a>
+        </div>
       </header>
 
       {/* ════════════════════════════════════════════════════════════════
@@ -435,7 +440,7 @@ export default function Home() {
         <div className="flex justify-between items-start gap-10 flex-wrap">
           {/* Brand */}
           <div className="flex-1 min-w-[240px]">
-            <img src="/assets/logo.svg" alt="AuraVault" className="h-8" />
+            <Logo className="h-8 text-[var(--color-ink-900)]" />
             <p className="text-[var(--color-ink-500)] text-[14px] max-w-[38ch] mt-3">
               A quieter way to keep the internet. Made with care, open-source forever.
             </p>

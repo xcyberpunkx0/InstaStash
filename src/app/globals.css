@@ -1,65 +1,65 @@
 /* ============================================================
    AuraVault — Global Styles
-   Design System: Moleskine sketchbook × glassmorphism × indie
-   Theme: Solar (pale cream + warm marigold) — single fixed theme
+   Default theme: Aurora (white paper + Gemini-style iridescent bg)
    ============================================================ */
-
-/* ---------- Fonts: self-hosted via next/font (see app/layout.tsx) ---
-   The CSS variables --font-*-loaded are injected on <html> by Next.js.
-   We map them to the design-system tokens with safe fallbacks so styles
-   never go un-rendered if the font fails to load. -------------------- */
 
 @import "tailwindcss";
 
 @theme {
-  /* ---------- Brand palette — Solar: pale cream + marigold -- */
-  --color-paper-50: #FFFBF1;
-  --color-paper-100: #FCF5E6;
-  --color-paper-200: #F4E8CC;
-  --color-paper-300: #E1CFA3;
-  --color-paper-400: #B89F6E;
+  /* ---------- Brand palette — Aurora: white paper + indigo ink ---- */
+  --color-paper-50: #FFFFFF;
+  --color-paper-100: #FAFBFC;
+  --color-paper-200: #F2F4F7;
+  --color-paper-300: #E5E8ED;
+  --color-paper-400: #C9CFD8;
 
-  --color-ink-900: #231C0E;
-  --color-ink-700: #382C18;
-  --color-ink-500: #5E4A2C;
-  --color-ink-400: #897048;
-  --color-ink-300: #B19872;
-  --color-ink-200: #CDBC9A;
+  --color-ink-900: #0F1117;
+  --color-ink-700: #1F2330;
+  --color-ink-500: #44495A;
+  --color-ink-400: #6B7184;
+  --color-ink-300: #9CA1B0;
+  --color-ink-200: #C5C9D2;
 
-  /* ---------- Accents — used SPARINGLY -------------------- */
-  --color-terra-500: #D77A1F;
-  --color-terra-600: #B05E10;
-  --color-terra-200: #F5D7A9;
-  --color-sage-500: #6A8A4A;
-  --color-sage-600: #506E36;
-  --color-sage-200: #D2DEB3;
-  --color-rouge-500: #B83A28;
+  /* ---------- Accents — Gemini iridescent: blue → violet → pink --- */
+  --color-terra-500: #4F8DF6;   /* Gemini blue — primary CTA */
+  --color-terra-600: #2E6EE0;   /* hover */
+  --color-terra-200: #D9E5FB;
+  --color-sage-500: #8C5BFF;    /* violet — success / tag */
+  --color-sage-600: #6F3DE3;
+  --color-sage-200: #E5DAFE;
+  --color-rouge-500: #F65A8C;   /* pink — errors */
+
+  /* ---------- Background aura colors — used by BackgroundAnime ---- */
+  --color-aura-1: rgba(99, 142, 246, 0.45);   /* blue */
+  --color-aura-2: rgba(140, 91, 255, 0.40);   /* violet */
+  --color-aura-3: rgba(246, 90, 140, 0.36);   /* pink */
+  --color-aura-vignette: rgba(255, 255, 255, 0.55);
 
   /* ---------- Semantic tokens ----------------------------- */
-  --color-fg-1: #231C0E;
-  --color-fg-2: #5E4A2C;
-  --color-fg-3: #B19872;
-  --color-fg-link: #B05E10;
+  --color-fg-1: var(--color-ink-900);
+  --color-fg-2: var(--color-ink-500);
+  --color-fg-3: var(--color-ink-300);
+  --color-fg-link: var(--color-terra-600);
 
-  --color-bg-canvas: #FCF5E6;
-  --color-bg-surface: #FFFBF1;
-  --color-bg-recessed: #F4E8CC;
-  --color-bg-glass: rgba(255, 251, 241, 0.65);
+  --color-bg-canvas: var(--color-paper-100);
+  --color-bg-surface: var(--color-paper-50);
+  --color-bg-recessed: var(--color-paper-200);
+  --color-bg-glass: rgba(255, 255, 255, 0.65);
 
   /* ---------- Lines & strokes ----------------------------- */
-  --color-line-soft: rgba(35, 28, 14, 0.08);
-  --color-line-medium: rgba(35, 28, 14, 0.16);
+  --color-line-soft: rgba(15, 17, 23, 0.06);
+  --color-line-medium: rgba(15, 17, 23, 0.12);
 
   /* ---------- Sticky note paper colors -------------------- */
   --sticky-yellow: #F5E6BD;
-  --sticky-yellow-fg: #231C0E;
+  --sticky-yellow-fg: #1F1B16;
   --sticky-sage: #D8DECF;
-  --sticky-sage-fg: #231C0E;
+  --sticky-sage-fg: #1F1B16;
   --sticky-terra: #EFD7C4;
-  --sticky-terra-fg: #231C0E;
+  --sticky-terra-fg: #1F1B16;
 
-  /* ---------- Grain (paper noise) ------------------------- */
-  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.045 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  /* ---------- Grain — barely-there on white -------------- */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.06  0 0 0 0 0.09  0 0 0 0.025 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 
   /* ---------- Radii --------------------------------------- */
   --radius-xs: 6px;
@@ -71,11 +71,11 @@
   --radius-pill: 999px;
 
   /* ---------- Shadows ------------------------------------- */
-  --shadow-page: 0 1px 0 rgba(31,27,22,0.04), 0 12px 28px -18px rgba(31,27,22,0.18);
-  --shadow-card: 0 1px 0 rgba(31,27,22,0.05), 0 8px 22px -12px rgba(31,27,22,0.22);
-  --shadow-lift: 0 2px 0 rgba(31,27,22,0.06), 0 20px 40px -16px rgba(31,27,22,0.28);
-  --shadow-glass: 0 1px 0 rgba(255,255,255,0.5) inset, 0 24px 60px -28px rgba(31,27,22,0.30);
-  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 0 rgba(31,27,22,0.05);
+  --shadow-page: 0 1px 0 rgba(15,17,23,0.04), 0 12px 28px -18px rgba(15,17,23,0.18);
+  --shadow-card: 0 1px 0 rgba(15,17,23,0.05), 0 8px 22px -12px rgba(15,17,23,0.22);
+  --shadow-lift: 0 2px 0 rgba(15,17,23,0.06), 0 20px 40px -16px rgba(15,17,23,0.28);
+  --shadow-glass: 0 1px 0 rgba(255,255,255,0.6) inset, 0 24px 60px -28px rgba(15,17,23,0.30);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(15,17,23,0.05);
 
   /* ---------- Type families (resolved from next/font variables) ----- */
   --font-display: var(--font-display-loaded), 'Cormorant Garamond', Georgia, serif;
@@ -123,6 +123,8 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.has-bg-lines { overflow-x: hidden; }
+
 /* ============================================================
    TYPOGRAPHY
    ============================================================ */
@@ -148,7 +150,6 @@ p {
   outline: none;
 }
 
-/* Skip to content link */
 .skip-link {
   position: absolute;
   top: -40px;
@@ -178,4 +179,203 @@ p {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================================
+   THEME VARIANTS — light, fixed
+   Each only overrides paper/ink/accents/aura, never structure.
+   Applied via data-theme="<id>" on <html>.
+   ============================================================ */
+
+/* Solar — pale cream + marigold (the original) */
+[data-theme="solar"] {
+  --color-paper-50: #FFFBF1;
+  --color-paper-100: #FCF5E6;
+  --color-paper-200: #F4E8CC;
+  --color-paper-300: #E1CFA3;
+  --color-paper-400: #B89F6E;
+
+  --color-ink-900: #231C0E;
+  --color-ink-700: #382C18;
+  --color-ink-500: #5E4A2C;
+  --color-ink-400: #897048;
+  --color-ink-300: #B19872;
+  --color-ink-200: #CDBC9A;
+
+  --color-terra-500: #D77A1F;
+  --color-terra-600: #B05E10;
+  --color-terra-200: #F5D7A9;
+  --color-sage-500: #6A8A4A;
+  --color-sage-600: #506E36;
+  --color-sage-200: #D2DEB3;
+  --color-rouge-500: #B83A28;
+
+  --color-aura-1: rgba(255, 199, 130, 0.55);
+  --color-aura-2: rgba(245, 215, 169, 0.40);
+  --color-aura-3: rgba(210, 222, 179, 0.32);
+  --color-aura-vignette: rgba(252, 245, 230, 0.55);
+
+  --color-bg-canvas: var(--color-paper-100);
+  --color-bg-surface: var(--color-paper-50);
+  --color-bg-recessed: var(--color-paper-200);
+  --color-bg-glass: rgba(255, 251, 241, 0.65);
+
+  --color-line-soft: rgba(35, 28, 14, 0.08);
+  --color-line-medium: rgba(35, 28, 14, 0.16);
+}
+
+/* Rose — soft blush + garnet */
+[data-theme="rose"] {
+  --color-paper-50: #FDFAF9;
+  --color-paper-100: #F9F1EE;
+  --color-paper-200: #F1E2DD;
+  --color-paper-300: #DCC5BD;
+  --color-paper-400: #B59993;
+
+  --color-ink-900: #2A1A1F;
+  --color-ink-700: #432930;
+  --color-ink-500: #74525A;
+  --color-ink-400: #997A82;
+  --color-ink-300: #BBA5AB;
+  --color-ink-200: #D4C5C9;
+
+  --color-terra-500: #C0394F;
+  --color-terra-600: #9A2A3D;
+  --color-terra-200: #EFC8CE;
+  --color-sage-500: #88836A;
+  --color-sage-600: #6A6651;
+  --color-sage-200: #DCD9C3;
+  --color-rouge-500: #A33240;
+
+  --color-aura-1: rgba(238, 156, 178, 0.45);
+  --color-aura-2: rgba(245, 200, 206, 0.40);
+  --color-aura-3: rgba(220, 205, 230, 0.32);
+  --color-aura-vignette: rgba(253, 250, 249, 0.55);
+
+  --color-bg-canvas: var(--color-paper-100);
+  --color-bg-surface: var(--color-paper-50);
+  --color-bg-recessed: var(--color-paper-200);
+  --color-bg-glass: rgba(253, 250, 249, 0.65);
+
+  --color-line-soft: rgba(42, 26, 31, 0.07);
+  --color-line-medium: rgba(42, 26, 31, 0.14);
+}
+
+/* Sky — pale blue-white + true blue */
+[data-theme="sky"] {
+  --color-paper-50: #FBFCFE;
+  --color-paper-100: #F4F7FC;
+  --color-paper-200: #E5EBF5;
+  --color-paper-300: #C8D4E8;
+  --color-paper-400: #9EAEC9;
+
+  --color-ink-900: #0E1A2A;
+  --color-ink-700: #1F2D44;
+  --color-ink-500: #45587A;
+  --color-ink-400: #6F82A2;
+  --color-ink-300: #9DACC4;
+  --color-ink-200: #C2CCDD;
+
+  --color-terra-500: #2D7BD9;
+  --color-terra-600: #1E5FB5;
+  --color-terra-200: #C9DEF5;
+  --color-sage-500: #4A9C9C;
+  --color-sage-600: #357E7E;
+  --color-sage-200: #C8E4E4;
+  --color-rouge-500: #C25058;
+
+  --color-aura-1: rgba(99, 162, 246, 0.45);
+  --color-aura-2: rgba(168, 220, 248, 0.40);
+  --color-aura-3: rgba(212, 230, 248, 0.32);
+  --color-aura-vignette: rgba(244, 247, 252, 0.55);
+
+  --color-bg-canvas: var(--color-paper-100);
+  --color-bg-surface: var(--color-paper-50);
+  --color-bg-recessed: var(--color-paper-200);
+  --color-bg-glass: rgba(251, 252, 254, 0.65);
+
+  --color-line-soft: rgba(14, 26, 42, 0.06);
+  --color-line-medium: rgba(14, 26, 42, 0.13);
+}
+
+/* Mint — soft cream-green + emerald */
+[data-theme="mint"] {
+  --color-paper-50: #FAFCFB;
+  --color-paper-100: #F1F7F3;
+  --color-paper-200: #DDEBE2;
+  --color-paper-300: #BCD3C4;
+  --color-paper-400: #8FAE9C;
+
+  --color-ink-900: #0F1F18;
+  --color-ink-700: #1E322A;
+  --color-ink-500: #3D5848;
+  --color-ink-400: #648068;
+  --color-ink-300: #93AB9A;
+  --color-ink-200: #BCCCBE;
+
+  --color-terra-500: #2EA66C;
+  --color-terra-600: #1F8455;
+  --color-terra-200: #C2E3D2;
+  --color-sage-500: #6FAEC5;
+  --color-sage-600: #4F8FA6;
+  --color-sage-200: #C8DCE6;
+  --color-rouge-500: #BC4646;
+
+  --color-aura-1: rgba(120, 200, 156, 0.45);
+  --color-aura-2: rgba(180, 222, 200, 0.40);
+  --color-aura-3: rgba(200, 224, 230, 0.32);
+  --color-aura-vignette: rgba(241, 247, 243, 0.55);
+
+  --color-bg-canvas: var(--color-paper-100);
+  --color-bg-surface: var(--color-paper-50);
+  --color-bg-recessed: var(--color-paper-200);
+  --color-bg-glass: rgba(250, 252, 251, 0.65);
+
+  --color-line-soft: rgba(15, 31, 24, 0.06);
+  --color-line-medium: rgba(15, 31, 24, 0.13);
+}
+
+/* Lavender — pale lilac + deep violet */
+[data-theme="lavender"] {
+  --color-paper-50: #FCFBFE;
+  --color-paper-100: #F5F3FB;
+  --color-paper-200: #E7E2F3;
+  --color-paper-300: #CCC4E2;
+  --color-paper-400: #A398C8;
+
+  --color-ink-900: #181028;
+  --color-ink-700: #281F3D;
+  --color-ink-500: #4D3F6F;
+  --color-ink-400: #756691;
+  --color-ink-300: #A095BB;
+  --color-ink-200: #C7BFD7;
+
+  --color-terra-500: #7C3FF2;
+  --color-terra-600: #5E29C8;
+  --color-terra-200: #DDCFFB;
+  --color-sage-500: #B560B5;
+  --color-sage-600: #913F91;
+  --color-sage-200: #E5C7E5;
+  --color-rouge-500: #C24E80;
+
+  --color-aura-1: rgba(146, 105, 244, 0.45);
+  --color-aura-2: rgba(206, 178, 247, 0.40);
+  --color-aura-3: rgba(238, 196, 232, 0.32);
+  --color-aura-vignette: rgba(245, 243, 251, 0.55);
+
+  --color-bg-canvas: var(--color-paper-100);
+  --color-bg-surface: var(--color-paper-50);
+  --color-bg-recessed: var(--color-paper-200);
+  --color-bg-glass: rgba(252, 251, 254, 0.65);
+
+  --color-line-soft: rgba(24, 16, 40, 0.06);
+  --color-line-medium: rgba(24, 16, 40, 0.13);
+}
+
+/* Smooth bg/text transitions when swapping themes */
+html { transition: background-color 240ms var(--ease-paper); }
+body {
+  transition:
+    background-color 240ms var(--ease-paper),
+    color 240ms var(--ease-paper);
 }

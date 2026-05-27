@@ -28,6 +28,7 @@ export default function LibraryPage() {
   const [urlInput, setUrlInput] = useState('');
   const [filter, setFilter] = useState<LibraryFilter>({ kind: 'everything' });
   const [toast, setToast] = useState<string | null>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // ─── Defer locale-formatted date to client to avoid hydration mismatch ───
   const [dateLabel, setDateLabel] = useState<string>('');
@@ -103,6 +104,18 @@ export default function LibraryPage() {
     window.location.href = `/?url=${encodeURIComponent(url)}`;
   }, []);
 
+  const handleClearAll = useCallback(() => {
+    if (items.length === 0) return;
+    const count = items.length;
+    const ok = confirm(
+      `Clear your entire library?\n\nThis will permanently remove ${count} ${count === 1 ? 'item' : 'items'}. This can't be undone.`,
+    );
+    if (!ok) return;
+    libraryStore.clear();
+    setOpenId(null);
+    showToast('library cleared ✦');
+  }, [items.length, showToast]);
+
   // ─── Section title derived from filter ──────────────────────────────────
   const sectionTitle = useMemo(() => {
     if (search) return 'Matches';
@@ -121,10 +134,15 @@ export default function LibraryPage() {
   const totalCount = items.length;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] h-screen max-w-[1440px] mx-auto">
-      <Sidebar filter={filter} onFilterChange={setFilter} />
+    <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] min-h-screen lg:h-screen max-w-[1440px] mx-auto">
+      <Sidebar
+        filter={filter}
+        onFilterChange={setFilter}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
+      />
 
-      <main className="overflow-y-auto p-7 md:px-9 md:py-7 pb-16 relative">
+      <main className="overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 md:px-9 md:py-7 pb-16 relative">
         {/* Decorative spiral doodle */}
         <DoodleSpiral
           className="absolute top-[30px] right-[110px] w-[70px] pointer-events-none hidden md:block text-[var(--color-terra-500)]"
@@ -132,17 +150,31 @@ export default function LibraryPage() {
         />
 
         {/* ─── TOPBAR ──────────────────────────────────────────────────── */}
-        <header className="flex items-center gap-3.5 pb-6">
-          <div>
+        <header className="flex items-start gap-3 pb-5 sm:pb-6">
+          {/* Mobile hamburger — opens the sidebar drawer */}
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open menu"
+            className="lg:hidden inline-flex w-10 h-10 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-line-medium)] text-[var(--color-ink-700)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] shrink-0 mt-1"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="4" x2="20" y1="6" y2="6"/>
+              <line x1="4" x2="20" y1="12" y2="12"/>
+              <line x1="4" x2="20" y1="18" y2="18"/>
+            </svg>
+          </button>
+
+          <div className="min-w-0 flex-1">
             <h1
               style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
-              className="text-[36px] leading-[1.05] text-[var(--color-ink-900)] m-0"
+              className="text-[28px] sm:text-[36px] leading-[1.05] text-[var(--color-ink-900)] m-0"
             >
               Your library
             </h1>
             <span
               style={{ fontFamily: 'var(--font-hand)', transform: 'rotate(-1deg)' }}
-              className="text-[20px] text-[var(--color-ink-500)] inline-block"
+              className="text-[16px] sm:text-[20px] text-[var(--color-ink-500)] inline-block"
               suppressHydrationWarning
             >
               {dateLabel ? `${dateLabel} · ` : ''}{totalCount} {totalCount === 1 ? 'thing' : 'things'} saved
@@ -153,7 +185,7 @@ export default function LibraryPage() {
         {/* ─── URL BAR ────────────────────────────────────────────────── */}
         <form
           onSubmit={(e) => { e.preventDefault(); handleSubmitUrl(); }}
-          className="flex items-center gap-2 py-2 pl-5 pr-2 bg-[var(--color-bg-surface)] rounded-[var(--radius-pill)] border border-[var(--color-line-medium)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_36px_-18px_rgba(31,27,22,0.22)] mb-8"
+          className="flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 pl-4 sm:pl-5 pr-1.5 sm:pr-2 bg-[var(--color-bg-surface)] rounded-[var(--radius-pill)] border border-[var(--color-line-medium)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_36px_-18px_rgba(31,27,22,0.22)] mb-6 sm:mb-8"
         >
           <svg className="w-[18px] h-[18px] text-[var(--color-ink-300)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/>
@@ -162,46 +194,53 @@ export default function LibraryPage() {
             type="text"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="paste a link to start..."
+            placeholder="paste a link..."
             style={{ fontFamily: 'var(--font-mono)' }}
-            className="flex-1 border-0 outline-none bg-transparent text-[14px] text-[var(--color-ink-900)] py-2.5 placeholder:text-[var(--color-ink-300)] placeholder:italic placeholder:font-[family-name:var(--font-display)] placeholder:text-[16px]"
+            className="flex-1 min-w-0 border-0 outline-none bg-transparent text-[14px] text-[var(--color-ink-900)] py-2 sm:py-2.5 placeholder:text-[var(--color-ink-300)] placeholder:italic placeholder:font-[family-name:var(--font-display)] placeholder:text-[15px] sm:placeholder:text-[16px]"
           />
+          {/* Paste — icon-only on mobile, label on desktop */}
           <button
             type="button"
             onClick={handlePaste}
+            aria-label="Paste from clipboard"
+            title="Paste"
             style={{ fontFamily: 'var(--font-grotesk)' }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] font-medium text-[12px] cursor-pointer hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
+            className="inline-flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-3.5 sm:py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] font-medium text-[12px] cursor-pointer hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] shrink-0"
           >
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
-            paste
+            <svg className="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            <span className="hidden sm:inline">paste</span>
           </button>
+          {/* Download — icon-only on mobile, label on desktop */}
           <button
             type="submit"
+            aria-label="Download"
             style={{ fontFamily: 'var(--font-grotesk)' }}
-            className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[var(--radius-pill)] bg-[var(--color-ink-900)] text-[var(--color-paper-50)] font-semibold text-[13px] cursor-pointer border-0 hover:translate-y-[-1px] transition-transform duration-[160ms]"
+            className="inline-flex items-center justify-center sm:gap-2 w-9 h-9 sm:w-auto sm:h-auto sm:px-[18px] sm:py-2.5 rounded-[var(--radius-pill)] bg-[var(--color-ink-900)] text-[var(--color-paper-50)] font-semibold text-[13px] cursor-pointer border-0 hover:translate-y-[-1px] transition-transform duration-[160ms] shrink-0"
           >
-            Download
-            <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+            <span className="hidden sm:inline">Download</span>
+            <svg className="w-4 h-4 sm:w-[13px] sm:h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
           </button>
         </form>
 
         {/* ─── SECTION HEADER ───────────────────────── */}
         {totalCount > 0 && (
-          <div className="flex items-baseline gap-3 mt-2 mb-3.5">
-            <h2
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
-              className="text-[22px] leading-[1.1] text-[var(--color-ink-900)] m-0"
-            >
-              {sectionTitle}
-            </h2>
-            <span
-              style={{ fontFamily: 'var(--font-mono)' }}
-              className="text-[12px] text-[var(--color-ink-400)]"
-            >
-              {visible.length === filtered.length ? `${visible.length} total` : `${visible.length} of ${filtered.length}`}
-            </span>
-            <div className="ml-auto flex items-center gap-2">
-              <div className="relative">
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3 mt-2 mb-3.5">
+            <div className="flex items-baseline gap-3 min-w-0">
+              <h2
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+                className="text-[20px] sm:text-[22px] leading-[1.1] text-[var(--color-ink-900)] m-0 truncate"
+              >
+                {sectionTitle}
+              </h2>
+              <span
+                style={{ fontFamily: 'var(--font-mono)' }}
+                className="text-[12px] text-[var(--color-ink-400)] shrink-0"
+              >
+                {visible.length === filtered.length ? `${visible.length} total` : `${visible.length} of ${filtered.length}`}
+              </span>
+            </div>
+            <div className="sm:ml-auto flex items-center gap-2">
+              <div className="relative w-full sm:w-auto">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--color-ink-300)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                 </svg>
@@ -212,9 +251,22 @@ export default function LibraryPage() {
                   placeholder="search..."
                   aria-label="Search library"
                   style={{ fontFamily: 'var(--font-sans)' }}
-                  className="pl-9 pr-3.5 py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] text-[13px] outline-none focus:border-[var(--color-terra-500)] transition-colors duration-[160ms] w-[200px]"
+                  className="w-full sm:w-[200px] pl-9 pr-3.5 py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] text-[13px] outline-none focus:border-[var(--color-terra-500)] transition-colors duration-[160ms]"
                 />
               </div>
+              <button
+                type="button"
+                onClick={handleClearAll}
+                aria-label="Clear all videos from library"
+                title="Clear all"
+                style={{ fontFamily: 'var(--font-grotesk)' }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-rouge-500)] font-medium text-[12px] cursor-pointer hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] shrink-0"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                <span className="hidden sm:inline">Clear all</span>
+              </button>
             </div>
           </div>
         )}
@@ -225,7 +277,7 @@ export default function LibraryPage() {
         ) : visible.length === 0 ? (
           <FilterEmpty filter={filter} search={search} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[18px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-[18px]">
             {visible.map((item) => (
               <LibraryCard
                 key={item.id}
@@ -485,9 +537,9 @@ function DetailPanel({
         role="dialog"
         aria-modal="true"
         aria-label={item.title}
-        className="fixed inset-0 z-30 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
+        className="fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-6 pointer-events-none"
       >
-        <GlassPanel className="relative w-full max-w-[420px] max-h-[calc(100vh-3rem)] p-[22px] overflow-y-auto flex flex-col gap-3.5 pointer-events-auto">
+        <GlassPanel className="relative w-full max-w-[420px] max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-3rem)] p-4 sm:p-[22px] overflow-y-auto flex flex-col gap-3.5 pointer-events-auto">
           {/* Close button */}
           <button
             onClick={onClose}

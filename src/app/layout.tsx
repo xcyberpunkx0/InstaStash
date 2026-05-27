@@ -7,6 +7,7 @@ import {
   Kalam,
   JetBrains_Mono,
 } from 'next/font/google';
+import { BackgroundAnime } from '@/components/ui/BackgroundAnime';
 import './globals.css';
 
 // ─── Fonts (self-hosted via next/font, preloaded, no FOUT) ───────────────────
@@ -69,11 +70,21 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${fontDisplay.variable} ${fontSans.variable} ${fontGrotesk.variable} ${fontHand.variable} ${fontKalam.variable} ${fontMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Apply persisted theme before paint so there's no flash of the default. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('auravault.theme');if(t){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body>
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
+        <BackgroundAnime />
         {children}
       </body>
     </html>
