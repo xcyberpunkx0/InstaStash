@@ -1,30 +1,29 @@
 /**
- * Rough.js canvas rendering utilities for the sketchbook theme.
- * Provides common drawing options and helper functions for creating
- * hand-drawn SVG elements using Rough.js.
+ * Rough.js utilities — kept for backward compatibility with existing tests.
+ * The new design system uses CSS-based styling instead of Rough.js canvas rendering.
  */
 import rough from 'roughjs';
 import type { Options as RoughOptions } from 'roughjs/bin/core';
 
-/** Theme colors used for Rough.js rendering */
+/** Theme colors — mapped to AuraVault design system */
 export const sketchColors = {
-  primary: '#BF5540',
-  border: '#C4B5A4',
-  text: '#3D3229',
-  secondary: '#7BB5A3',
-  accent: '#F4C06F',
-  error: '#C04038',
-  success: '#6BA87B',
+  primary: '#C97B4E',     // terra-500
+  border: '#C9B89E',      // paper-400
+  text: '#1F1B16',        // ink-900
+  secondary: '#7A8A6F',   // sage-500
+  accent: '#C97B4E',      // terra-500
+  error: '#B25548',       // rouge-500
+  success: '#7A8A6F',     // sage-500
 } as const;
 
-/** Animation duration constants (in ms) for micro-animations */
+/** Animation duration constants (in ms) */
 export const animationDurations = {
-  micro: 200,
-  standard: 300,
-  slow: 400,
+  micro: 140,
+  standard: 240,
+  slow: 420,
 } as const;
 
-/** Default Rough.js drawing options for the sketchbook aesthetic */
+/** Default Rough.js drawing options */
 export const defaultRoughOptions: RoughOptions = {
   roughness: 1.5,
   bowing: 1,
@@ -42,7 +41,7 @@ export const buttonRoughOptions: RoughOptions = {
   fillStyle: 'solid',
 };
 
-/** Rough.js options for a lighter, more subtle border */
+/** Rough.js options for subtle borders */
 export const subtleRoughOptions: RoughOptions = {
   roughness: 0.8,
   bowing: 0.5,
@@ -51,17 +50,10 @@ export const subtleRoughOptions: RoughOptions = {
   fillStyle: 'hachure',
 };
 
-/**
- * Creates a Rough.js SVG instance from an SVG element.
- */
 export function createRoughSvg(svgElement: SVGSVGElement) {
   return rough.svg(svgElement);
 }
 
-/**
- * Draws a hand-drawn rectangle on an SVG element using Rough.js.
- * Returns the generated SVG node for appending to the SVG.
- */
 export function drawRoughRect(
   svgElement: SVGSVGElement,
   x: number,
@@ -75,30 +67,16 @@ export function drawRoughRect(
   return rc.rectangle(x, y, width, height, mergedOptions);
 }
 
-/**
- * Draws a hand-drawn rounded rectangle (approximated with a rectangle
- * since Rough.js doesn't natively support border-radius).
- */
 export function drawSketchBorder(
   svgElement: SVGSVGElement,
   width: number,
   height: number,
   options?: Partial<RoughOptions>
 ) {
-  const padding = 2; // Small padding so strokes don't clip
-  return drawRoughRect(
-    svgElement,
-    padding,
-    padding,
-    width - padding * 2,
-    height - padding * 2,
-    options
-  );
+  const padding = 2;
+  return drawRoughRect(svgElement, padding, padding, width - padding * 2, height - padding * 2, options);
 }
 
-/**
- * Merges custom options with default rough options.
- */
 export function mergeRoughOptions(custom: Partial<RoughOptions>): RoughOptions {
   return { ...defaultRoughOptions, ...custom };
 }

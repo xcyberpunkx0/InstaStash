@@ -1,74 +1,154 @@
+/* ============================================================
+   AuraVault — Global Styles
+   Design System: Moleskine sketchbook × glassmorphism × indie
+   ============================================================ */
+
+/* ---------- Fonts: self-hosted via next/font (see app/layout.tsx) ---
+   The CSS variables --font-*-loaded are injected on <html> by Next.js.
+   We map them to the design-system tokens with safe fallbacks so styles
+   never go un-rendered if the font fails to load. -------------------- */
+
 @import "tailwindcss";
 
 @theme {
-  /* Sketchbook Theme Colors */
-  --color-background: #FFF8F0;
-  --color-surface: #FFFDF9;
-  --color-primary: #BF5540;
-  --color-secondary: #7BB5A3;
-  --color-accent: #F4C06F;
-  --color-text: #3D3229;
-  --color-text-muted: #756558;
-  --color-error: #C04038;
-  --color-success: #6BA87B;
-  --color-border: #C4B5A4;
+  /* ---------- Brand palette — warm paper + ink -------------- */
+  --color-paper-50: #FBF8F2;
+  --color-paper-100: #F7F3EE;
+  --color-paper-200: #EFE7DA;
+  --color-paper-300: #E4D8C5;
+  --color-paper-400: #C9B89E;
 
-  /* Fonts */
-  --font-heading: 'Caveat', cursive;
-  --font-body: 'Nunito', sans-serif;
+  --color-ink-900: #1F1B16;
+  --color-ink-700: #3A3127;
+  --color-ink-500: #6B5544;
+  --color-ink-400: #8A7866;
+  --color-ink-300: #A89F94;
+  --color-ink-200: #C9C0B3;
 
-  /* Border Radius */
-  --radius-sketch: 4px;
+  /* ---------- Accents — used SPARINGLY -------------------- */
+  --color-terra-500: #C97B4E;
+  --color-terra-600: #B0673E;
+  --color-terra-200: #EFD7C4;
+  --color-sage-500: #7A8A6F;
+  --color-sage-600: #62725A;
+  --color-sage-200: #D8DECF;
+  --color-rouge-500: #B25548;
 
-  /* Animation Durations */
-  --animate-micro: 200ms ease-in-out;
-  --animate-standard: 300ms ease-in-out;
-  --animate-slow: 400ms ease-in-out;
+  /* ---------- Semantic tokens ----------------------------- */
+  --color-fg-1: #1F1B16;
+  --color-fg-2: #6B5544;
+  --color-fg-3: #A89F94;
+  --color-fg-link: #B0673E;
 
-  /* Breakpoints */
-  --breakpoint-mobile: 768px;
-  --breakpoint-tablet: 1024px;
+  --color-bg-canvas: #F7F3EE;
+  --color-bg-surface: #FBF8F2;
+  --color-bg-recessed: #EFE7DA;
+  --color-bg-glass: rgba(251, 248, 242, 0.62);
+
+  /* ---------- Lines & strokes ----------------------------- */
+  --color-line-soft: rgba(31, 27, 22, 0.08);
+  --color-line-medium: rgba(31, 27, 22, 0.16);
+
+  /* ---------- Radii --------------------------------------- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --radius-pill: 999px;
+
+  /* ---------- Shadows ------------------------------------- */
+  --shadow-page: 0 1px 0 rgba(31,27,22,0.04), 0 12px 28px -18px rgba(31,27,22,0.18);
+  --shadow-card: 0 1px 0 rgba(31,27,22,0.05), 0 8px 22px -12px rgba(31,27,22,0.22);
+  --shadow-lift: 0 2px 0 rgba(31,27,22,0.06), 0 20px 40px -16px rgba(31,27,22,0.28);
+  --shadow-glass: 0 1px 0 rgba(255,255,255,0.5) inset, 0 24px 60px -28px rgba(31,27,22,0.30);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 0 rgba(31,27,22,0.05);
+
+  /* ---------- Type families (resolved from next/font variables) ----- */
+  --font-display: var(--font-display-loaded), 'Cormorant Garamond', Georgia, serif;
+  --font-sans: var(--font-sans-loaded), 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-grotesk: var(--font-grotesk-loaded), 'Bricolage Grotesque', 'DM Sans', sans-serif;
+  --font-hand: var(--font-hand-loaded), 'Caveat', cursive;
+  --font-kalam: var(--font-kalam-loaded), 'Kalam', cursive;
+  --font-mono: var(--font-mono-loaded), 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- Type scale ---------------------------------- */
+  --text-hero: clamp(56px, 9vw, 112px);
+  --text-h1: clamp(40px, 5vw, 64px);
+  --text-h2: clamp(28px, 3.4vw, 40px);
+  --text-h3: 22px;
+  --text-body: 16px;
+  --text-small: 14px;
+  --text-micro: 12px;
+
+  /* ---------- Motion -------------------------------------- */
+  --ease-paper: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-duration-fast: 140ms;
+  --animate-duration-base: 240ms;
+  --animate-duration-slow: 420ms;
 }
 
-/* Base styles */
-body {
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-body);
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+html, body {
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
+}
+
+body {
+  background-color: var(--color-bg-canvas);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.045 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-blend-mode: multiply;
+  color: var(--color-fg-1);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1, h2, h3 {
+  color: var(--color-fg-1);
+  margin: 0;
 }
 
-/* Focus-visible styles for keyboard navigation */
+p {
+  color: var(--color-fg-2);
+}
+
+/* ============================================================
+   FOCUS & ACCESSIBILITY
+   ============================================================ */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-terra-500);
   outline-offset: 2px;
-  border-radius: var(--radius-sketch);
+  border-radius: var(--radius-sm);
 }
 
-/* Remove default focus outline for mouse users */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Skip to content link (hidden until focused) */
+/* Skip to content link */
 .skip-link {
   position: absolute;
   top: -40px;
   left: 0;
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-ink-900);
+  color: var(--color-paper-50);
   padding: 8px 16px;
   z-index: 100;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: 14px;
-  border-radius: var(--radius-sketch);
-  transition: top 0.2s ease-in-out;
+  border-radius: var(--radius-pill);
+  transition: top 200ms var(--ease-paper);
 }
 
 .skip-link:focus {
@@ -76,16 +156,14 @@ h1, h2, h3, h4, h5, h6 {
   left: 8px;
 }
 
-/* Reduced motion support */
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .skip-link {
-    transition: none;
   }
 }

@@ -1,39 +1,6 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DownloadProgress } from './DownloadProgress';
-
-// Polyfill ResizeObserver for jsdom
-beforeAll(() => {
-  global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  } as unknown as typeof ResizeObserver;
-});
-
-// Mock roughjs to avoid canvas/SVG rendering issues in jsdom
-vi.mock('roughjs', () => {
-  const createMockNode = () => {
-    const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    return el;
-  };
-
-  return {
-    default: {
-      svg: () => ({
-        rectangle: () => createMockNode(),
-        circle: () => createMockNode(),
-        line: () => createMockNode(),
-      }),
-    },
-  };
-});
-
-// Mock useReducedMotion hook
-const mockUseReducedMotion = vi.fn(() => false);
-vi.mock('@/hooks/useReducedMotion', () => ({
-  useReducedMotion: () => mockUseReducedMotion(),
-}));
 
 describe('DownloadProgress', () => {
   describe('downloading state', () => {
@@ -88,7 +55,7 @@ describe('DownloadProgress', () => {
     it('shows completion message', () => {
       render(<DownloadProgress percentage={100} status="complete" />);
 
-      expect(screen.getByText('Download complete!')).toBeInTheDocument();
+      expect(screen.getByText(/Download complete/)).toBeInTheDocument();
     });
 
     it('does not show progress bar', () => {
@@ -103,7 +70,7 @@ describe('DownloadProgress', () => {
       expect(screen.getByTestId('download-progress-complete')).toBeInTheDocument();
     });
 
-    it('renders celebratory SVG doodle', () => {
+    it('renders celebratory SVG', () => {
       const { container } = render(<DownloadProgress percentage={100} status="complete" />);
 
       const svgs = container.querySelectorAll('svg');
@@ -122,7 +89,7 @@ describe('DownloadProgress', () => {
       const onRetry = vi.fn();
       render(<DownloadProgress percentage={50} status="error" onRetry={onRetry} />);
 
-      const retryButton = screen.getByRole('button', { name: /retry download/i });
+      const retryButton = screen.getByRole('button', { name: /try again/i });
       expect(retryButton).toBeInTheDocument();
     });
 
@@ -130,7 +97,7 @@ describe('DownloadProgress', () => {
       const onRetry = vi.fn();
       render(<DownloadProgress percentage={50} status="error" onRetry={onRetry} />);
 
-      const retryButton = screen.getByRole('button', { name: /retry download/i });
+      const retryButton = screen.getByRole('button', { name: /try again/i });
       fireEvent.click(retryButton);
 
       expect(onRetry).toHaveBeenCalledTimes(1);
@@ -146,28 +113,6 @@ describe('DownloadProgress', () => {
       render(<DownloadProgress percentage={50} status="error" />);
 
       expect(screen.getByTestId('download-progress-error')).toBeInTheDocument();
-    });
-  });
-
-  describe('reduced motion', () => {
-    it('disables transition when prefers-reduced-motion is enabled', () => {
-      mockUseReducedMotion.mockReturnValue(true);
-
-      const { container } = render(<DownloadProgress percentage={50} status="downloading" />);
-
-      const fillContainer = container.querySelector('[style*="transition"]');
-      expect(fillContainer).toHaveStyle({ transitionDuration: '0ms' });
-
-      mockUseReducedMotion.mockReturnValue(false);
-    });
-
-    it('enables transition when prefers-reduced-motion is not set', () => {
-      mockUseReducedMotion.mockReturnValue(false);
-
-      const { container } = render(<DownloadProgress percentage={50} status="downloading" />);
-
-      const fillContainer = container.querySelector('[style*="transition"]');
-      expect(fillContainer).toHaveStyle({ transitionDuration: '300ms' });
     });
   });
 

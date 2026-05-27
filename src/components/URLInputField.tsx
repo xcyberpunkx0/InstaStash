@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useRef, useCallback, type ClipboardEvent, type ChangeEvent, type KeyboardEvent } from 'react';
-import { SketchBorder } from './SketchBorder';
 
 export interface URLInputFieldProps {
   onSubmit: (url: string) => void;
@@ -21,8 +20,8 @@ const platformLabels: Record<string, string> = {
 };
 
 /**
- * Sketchbook-styled URL input field with paste handling, loading state,
- * inline error messages, and platform badge display.
+ * URL input field following AuraVault design system.
+ * Pill-shaped input with paste handling, loading state, and platform badge.
  */
 export function URLInputField({ onSubmit, isLoading, error, detectedPlatform }: URLInputFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,9 +29,7 @@ export function URLInputField({ onSubmit, isLoading, error, detectedPlatform }: 
   const handleSubmit = useCallback(
     (value: string) => {
       const trimmed = value.trim();
-      if (trimmed) {
-        onSubmit(trimmed);
-      }
+      if (trimmed) onSubmit(trimmed);
     },
     [onSubmit]
   );
@@ -42,14 +39,8 @@ export function URLInputField({ onSubmit, isLoading, error, detectedPlatform }: 
       e.preventDefault();
       const pastedText = e.clipboardData.getData('text');
       const trimmed = pastedText.trim();
-
-      if (inputRef.current) {
-        inputRef.current.value = trimmed;
-      }
-
-      if (trimmed) {
-        handleSubmit(trimmed);
-      }
+      if (inputRef.current) inputRef.current.value = trimmed;
+      if (trimmed) handleSubmit(trimmed);
     },
     [handleSubmit]
   );
@@ -57,9 +48,7 @@ export function URLInputField({ onSubmit, isLoading, error, detectedPlatform }: 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.trim();
-      if (value) {
-        handleSubmit(value);
-      }
+      if (value) handleSubmit(value);
     },
     [handleSubmit]
   );
@@ -68,8 +57,7 @@ export function URLInputField({ onSubmit, isLoading, error, detectedPlatform }: 
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const value = inputRef.current?.value ?? '';
-        handleSubmit(value);
+        handleSubmit(inputRef.current?.value ?? '');
       }
     },
     [handleSubmit]
@@ -81,55 +69,53 @@ export function URLInputField({ onSubmit, isLoading, error, detectedPlatform }: 
   const platformLabel = platformKey ? platformLabels[platformKey] : null;
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <label htmlFor="url-input" className="block font-body text-text mb-2 text-sm">
+    <div className="w-full max-w-[720px] mx-auto">
+      <label htmlFor="url-input" className="block text-[var(--color-ink-500)] mb-2 text-[14px] font-[family-name:var(--font-sans)]">
         Paste a video URL
       </label>
 
-      <SketchBorder className="w-full">
-        <div className="flex items-center gap-2 px-4 py-3">
-          <input
-            ref={inputRef}
-            id="url-input"
-            type="url"
-            maxLength={2048}
-            placeholder="https://www.instagram.com/reel/... or youtube.com/watch?v=..."
-            className="flex-1 bg-transparent font-body text-text placeholder:text-text-muted outline-none text-base min-w-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
-            onPaste={handlePaste}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            aria-describedby={error ? 'url-input-error' : undefined}
-            aria-invalid={!!error}
-            aria-busy={isLoading}
-          />
+      <div className="flex items-center gap-2 px-5 py-3 bg-[var(--color-bg-surface)] rounded-[var(--radius-pill)] border border-[var(--color-line-medium)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_36px_-18px_rgba(31,27,22,0.22)]">
+        <input
+          ref={inputRef}
+          id="url-input"
+          type="url"
+          maxLength={2048}
+          placeholder="https://www.instagram.com/reel/... or youtube.com/watch?v=..."
+          className="flex-1 bg-transparent font-[family-name:var(--font-mono)] text-[14px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-300)] placeholder:italic placeholder:font-[family-name:var(--font-display)] outline-none min-w-0 py-1"
+          onPaste={handlePaste}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          disabled={isLoading}
+          aria-describedby={error ? 'url-input-error' : undefined}
+          aria-invalid={!!error}
+          aria-busy={isLoading}
+        />
 
-          {isLoading && (
-            <div
-              className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin shrink-0"
-              role="status"
-              aria-label="Detecting platform"
-            >
-              <span className="sr-only">Detecting platform...</span>
-            </div>
-          )}
+        {isLoading && (
+          <div
+            className="w-5 h-5 border-2 border-[var(--color-terra-500)] border-t-transparent rounded-full animate-spin shrink-0"
+            role="status"
+            aria-label="Detecting platform"
+          >
+            <span className="sr-only">Detecting platform...</span>
+          </div>
+        )}
 
-          {!isLoading && detectedPlatform && platformLabel && (
-            <span
-              className="inline-flex items-center px-2 py-0.5 rounded-sketch text-xs font-body font-semibold shrink-0 border border-border text-text-muted bg-surface"
-              aria-label={`Detected: ${platformLabel}`}
-            >
-              {detectedPlatform.platform === 'instagram' ? '📷' : '▶️'}{' '}
-              {platformLabel}
-            </span>
-          )}
-        </div>
-      </SketchBorder>
+        {!isLoading && detectedPlatform && platformLabel && (
+          <span
+            className="inline-flex items-center px-3 py-1 rounded-[var(--radius-pill)] text-[11px] font-[family-name:var(--font-grotesk)] font-semibold shrink-0 bg-[var(--color-sage-200)] text-[var(--color-sage-600)]"
+            aria-label={`Detected: ${platformLabel}`}
+          >
+            {detectedPlatform.platform === 'instagram' ? '📷' : '▶️'}{' '}
+            {platformLabel}
+          </span>
+        )}
+      </div>
 
       {error && (
         <p
           id="url-input-error"
-          className="mt-2 text-sm font-body text-error"
+          className="mt-2 text-[14px] font-[family-name:var(--font-sans)] text-[var(--color-rouge-500)]"
           role="alert"
         >
           {error}

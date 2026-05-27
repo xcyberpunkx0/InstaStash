@@ -1,22 +1,63 @@
 import type { Metadata } from 'next';
-import { Caveat, Nunito } from 'next/font/google';
+import {
+  Cormorant_Garamond,
+  DM_Sans,
+  Bricolage_Grotesque,
+  Caveat,
+  Kalam,
+  JetBrains_Mono,
+} from 'next/font/google';
 import './globals.css';
 
-const caveat = Caveat({
+// ─── Fonts (self-hosted via next/font, preloaded, no FOUT) ───────────────────
+
+const fontDisplay = Cormorant_Garamond({
   subsets: ['latin'],
-  variable: '--font-heading',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display-loaded',
   display: 'swap',
 });
 
-const nunito = Nunito({
+const fontSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-body',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-sans-loaded',
+  display: 'swap',
+});
+
+const fontGrotesk = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-grotesk-loaded',
+  display: 'swap',
+});
+
+const fontHand = Caveat({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-hand-loaded',
+  display: 'swap',
+});
+
+const fontKalam = Kalam({
+  subsets: ['latin'],
+  weight: ['300', '400', '700'],
+  variable: '--font-kalam-loaded',
+  display: 'swap',
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-mono-loaded',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Video Downloader - Sketchbook Style',
-  description: 'Download videos from Instagram and YouTube with a warm, hand-drawn aesthetic.',
+  title: 'AuraVault — Save the internet, beautifully.',
+  description:
+    'Download videos from YouTube, Instagram, TikTok and seventy more — fast, open-source, and blessedly distraction-free.',
 };
 
 export default function RootLayout({
@@ -25,8 +66,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${caveat.variable} ${nunito.variable}`}>
-      <body className="min-h-screen bg-background text-text font-body antialiased">
+    <html
+      lang="en"
+      className={`${fontDisplay.variable} ${fontSans.variable} ${fontGrotesk.variable} ${fontHand.variable} ${fontKalam.variable} ${fontMono.variable}`}
+    >
+      <body>
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

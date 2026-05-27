@@ -35,10 +35,6 @@ export const moodMap: Record<ErrorMessageProps['type'], SketchCharacterProps['mo
   format: 'error',
 };
 
-/**
- * Returns the user-facing error message for a given error type.
- * For rate-limit errors, interpolates the countdown value.
- */
 export function getErrorMessage(type: ErrorMessageProps['type'], countdown?: number): string {
   const template = errorMessages[type];
   if (type === 'rate-limit' && countdown !== undefined && countdown > 0) {
@@ -51,8 +47,7 @@ export function getErrorMessage(type: ErrorMessageProps['type'], countdown?: num
 }
 
 /**
- * Friendly error display component with SketchCharacter mood and optional retry button.
- * Accessible via role="alert" for screen readers.
+ * Error display component following AuraVault design system.
  */
 export function ErrorMessage({
   type,
@@ -65,29 +60,21 @@ export function ErrorMessage({
   const displayMessage = getErrorMessage(type, countdown);
 
   return (
-    <div className="flex flex-col items-center gap-4 p-6 text-center">
+    <div className="flex flex-col items-center gap-4 py-6 text-center">
       <SketchCharacter mood={mood} />
 
-      <p
-        role="alert"
-        className="font-body text-error text-base max-w-md"
-      >
+      <p role="alert" className="text-[15px] text-[var(--color-rouge-500)] max-w-[400px]">
         {displayMessage}
       </p>
 
       {countdown !== undefined && countdown > 0 && type === 'rate-limit' && (
-        <p className="font-body text-textMuted text-sm" aria-live="polite">
-          Retry available in {countdown}s
+        <p className="font-[family-name:var(--font-hand)] text-[20px] text-[var(--color-ink-400)]" aria-live="polite">
+          retry in {countdown}s...
         </p>
       )}
 
       {retryAction && (
-        <SketchButton
-          variant="secondary"
-          onClick={retryAction}
-          disabled={retryDisabled}
-          aria-label="Retry"
-        >
+        <SketchButton variant="secondary" onClick={retryAction} disabled={retryDisabled} aria-label="Retry">
           Try Again
         </SketchButton>
       )}

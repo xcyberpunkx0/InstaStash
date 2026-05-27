@@ -2,17 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { PlatformIndicator } from './PlatformIndicator';
 
-// Mock roughjs to avoid canvas/SVG rendering issues in jsdom
-vi.mock('roughjs', () => ({
-  default: {
-    svg: () => ({
-      rectangle: () => document.createElementNS('http://www.w3.org/2000/svg', 'g'),
-      circle: () => document.createElementNS('http://www.w3.org/2000/svg', 'g'),
-      polygon: () => document.createElementNS('http://www.w3.org/2000/svg', 'g'),
-    }),
-  },
-}));
-
 describe('PlatformIndicator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -44,30 +33,15 @@ describe('PlatformIndicator', () => {
     expect(indicator).toHaveAttribute('aria-label', 'Detected platform: Instagram Reel');
   });
 
-  it('applies color styling for Instagram', () => {
-    render(<PlatformIndicator platform="instagram" contentType="post" />);
-    const label = screen.getByText('Instagram Post');
-    // Verify color style is applied (jsdom converts hex to rgb)
-    expect(label.style.color).toBeTruthy();
-  });
-
-  it('applies color styling for YouTube', () => {
-    render(<PlatformIndicator platform="youtube" contentType="video" />);
-    const label = screen.getByText('YouTube Video');
-    // Verify color style is applied (jsdom converts hex to rgb)
-    expect(label.style.color).toBeTruthy();
-  });
-
-  it('applies different colors for different platforms', () => {
-    const { rerender } = render(<PlatformIndicator platform="instagram" contentType="post" />);
-    const igLabel = screen.getByText('Instagram Post');
-    const igColor = igLabel.style.color;
+  it('applies different styling for Instagram vs YouTube', () => {
+    const { rerender, container } = render(<PlatformIndicator platform="instagram" contentType="post" />);
+    const igClasses = container.firstElementChild?.className ?? '';
 
     rerender(<PlatformIndicator platform="youtube" contentType="video" />);
-    const ytLabel = screen.getByText('YouTube Video');
-    const ytColor = ytLabel.style.color;
+    const ytClasses = container.firstElementChild?.className ?? '';
 
-    expect(igColor).not.toBe(ytColor);
+    // Different platforms should have different class styling
+    expect(igClasses).not.toBe(ytClasses);
   });
 
   it('renders an SVG element for the icon', () => {

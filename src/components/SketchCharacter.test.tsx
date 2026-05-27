@@ -1,26 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { SketchCharacter } from './SketchCharacter';
-
-// Mock roughjs to avoid canvas/SVG rendering issues in jsdom
-vi.mock('roughjs', () => {
-  const createMockNode = () => {
-    const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    return el;
-  };
-
-  return {
-    default: {
-      svg: () => ({
-        circle: () => createMockNode(),
-        line: () => createMockNode(),
-        arc: () => createMockNode(),
-        ellipse: () => createMockNode(),
-        rectangle: () => createMockNode(),
-      }),
-    },
-  };
-});
 
 describe('SketchCharacter', () => {
   const moods = ['idle', 'thinking', 'happy', 'sad', 'error'] as const;
@@ -45,17 +25,17 @@ describe('SketchCharacter', () => {
     expect(svg?.getAttribute('role')).toBe('img');
   });
 
-  it('renders at 80x80 size', () => {
+  it('renders at 64x64 size', () => {
     const { container } = render(<SketchCharacter mood="idle" />);
     const svg = container.querySelector('svg');
-    expect(svg?.getAttribute('width')).toBe('80');
-    expect(svg?.getAttribute('height')).toBe('80');
+    expect(svg?.getAttribute('width')).toBe('64');
+    expect(svg?.getAttribute('height')).toBe('64');
   });
 
   it('has correct viewBox', () => {
     const { container } = render(<SketchCharacter mood="idle" />);
     const svg = container.querySelector('svg');
-    expect(svg?.getAttribute('viewBox')).toBe('0 0 80 80');
+    expect(svg?.getAttribute('viewBox')).toBe('0 0 64 64');
   });
 
   it('displays distinct aria-labels for each mood', () => {
@@ -66,7 +46,6 @@ describe('SketchCharacter', () => {
       const label = svg?.getAttribute('aria-label') ?? '';
       labels.add(label);
     });
-    // Each mood should have a unique label
     expect(labels.size).toBe(moods.length);
   });
 

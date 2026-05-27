@@ -11,30 +11,32 @@ import {
 describe('rough-utils', () => {
   describe('sketchColors', () => {
     it('defines the correct theme colors', () => {
-      expect(sketchColors.primary).toBe('#BF5540');
-      expect(sketchColors.border).toBe('#C4B5A4');
-      expect(sketchColors.text).toBe('#3D3229');
-      expect(sketchColors.secondary).toBe('#7BB5A3');
-      expect(sketchColors.accent).toBe('#F4C06F');
-      expect(sketchColors.error).toBe('#C04038');
-      expect(sketchColors.success).toBe('#6BA87B');
+      // Updated to match AuraVault design system
+      expect(sketchColors.primary).toBe('#C97B4E');     // terra-500
+      expect(sketchColors.border).toBe('#C9B89E');      // paper-400
+      expect(sketchColors.text).toBe('#1F1B16');        // ink-900
+      expect(sketchColors.secondary).toBe('#7A8A6F');   // sage-500
+      expect(sketchColors.accent).toBe('#C97B4E');      // terra-500
+      expect(sketchColors.error).toBe('#B25548');       // rouge-500
+      expect(sketchColors.success).toBe('#7A8A6F');     // sage-500
     });
   });
 
   describe('animationDurations', () => {
-    it('defines durations within 150-400ms range', () => {
-      expect(animationDurations.micro).toBeGreaterThanOrEqual(150);
-      expect(animationDurations.micro).toBeLessThanOrEqual(400);
-      expect(animationDurations.standard).toBeGreaterThanOrEqual(150);
-      expect(animationDurations.standard).toBeLessThanOrEqual(400);
-      expect(animationDurations.slow).toBeGreaterThanOrEqual(150);
-      expect(animationDurations.slow).toBeLessThanOrEqual(400);
+    it('defines durations within 100-500ms range', () => {
+      expect(animationDurations.micro).toBeGreaterThanOrEqual(100);
+      expect(animationDurations.micro).toBeLessThanOrEqual(500);
+      expect(animationDurations.standard).toBeGreaterThanOrEqual(100);
+      expect(animationDurations.standard).toBeLessThanOrEqual(500);
+      expect(animationDurations.slow).toBeGreaterThanOrEqual(100);
+      expect(animationDurations.slow).toBeLessThanOrEqual(500);
     });
 
     it('has correct specific values', () => {
-      expect(animationDurations.micro).toBe(200);
-      expect(animationDurations.standard).toBe(300);
-      expect(animationDurations.slow).toBe(400);
+      // Updated to match AuraVault design system: 140 / 240 / 420
+      expect(animationDurations.micro).toBe(140);
+      expect(animationDurations.standard).toBe(240);
+      expect(animationDurations.slow).toBe(420);
     });
   });
 

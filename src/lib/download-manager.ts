@@ -106,12 +106,16 @@ export class DownloadManager {
 
     return new ReadableStream<Uint8Array>({
       start: (controller) => {
-        // Spawn yt-dlp to download to stdout
-        // -f formatId: select the specific format
-        // -o -: output to stdout
-        // --newline: print progress on new lines (easier to parse)
+        // Format selector strategy: numeric YouTube IDs merge with bestaudio,
+        // anything else falls back to bestvideo*+bestaudio so Instagram/TikTok/etc
+        // always get audio.
+        const isYouTubeNumericFormat = /^\d+$/.test(formatId);
+        const formatSelector = isYouTubeNumericFormat
+          ? `${formatId}+bestaudio/best`
+          : 'bestvideo*+bestaudio/best';
+
         const args = [
-          '-f', formatId,
+          '-f', formatSelector,
           '-o', '-',
           '--newline',
           '--no-part',
