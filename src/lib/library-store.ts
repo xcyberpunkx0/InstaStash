@@ -10,6 +10,7 @@
 import type { Platform } from '@/types';
 
 const STORAGE_KEY = 'auravault.library.v1';
+const COLLECTIONS_KEY = 'auravault.collections.v1';
 const STORAGE_EVENT = 'auravault:library-changed';
 
 export interface LibraryItem {
@@ -25,6 +26,14 @@ export interface LibraryItem {
   filename: string;
   savedAt: number; // epoch ms
   note?: string;
+  collections?: string[];
+}
+
+// Audio formats — used by sidebar/library to bucket items into video vs audio
+export const AUDIO_EXTS = new Set(['mp3', 'm4a', 'flac', 'wav', 'opus', 'ogg', 'aac']);
+
+export function isAudioItem(item: Pick<LibraryItem, 'format'>): boolean {
+  return AUDIO_EXTS.has((item.format ?? '').toLowerCase());
 }
 
 // ─── Internal helpers ──────────────────────────────────────────────────────
@@ -78,6 +87,7 @@ export const libraryStore = {
       ...item,
       id: generateId(),
       savedAt: Date.now(),
+      collections: item.collections ?? [],
     };
     writeAll([newItem, ...readAll()]);
     return newItem;
@@ -95,6 +105,19 @@ export const libraryStore = {
     writeAll([]);
   },
 
+  /** Toggle membership of an item in a collection. */
+  toggleCollection(itemId: string, collectionId: string): void {
+    const items = readAll();
+    const updated = items.map((it) => {
+      if (it.id !== itemId) return it;
+      const current = new Set(it.collections ?? []);
+      if (current.has(collectionId)) current.delete(collectionId);
+      else current.add(collectionId);
+      return { ...it, collections: Array.from(current) };
+    });
+    writeAll(updated);
+  },
+
   /** Subscribe to library changes (returns an unsubscribe fn). */
   subscribe(listener: () => void): () => void {
     if (!isBrowser()) return () => {};
@@ -105,6 +128,85 @@ export const libraryStore = {
       window.removeEventListener(STORAGE_EVENT, handler);
       window.removeEventListener('storage', handler);
     };
+  },
+};
+
+// ─── Collections store ─────────────────────────────────────────────────────
+
+export interface Collection {
+  id: string;
+  name: string;
+  color: string; // hex
+  createdAt: number;
+}
+
+const DEFAULT_COLORS = ['#C97B4E', '#7A8A6F', '#6B5544', '#B0673E', '#62725A', '#B25548'];
+
+function readCollections(): Collection[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = window.localStorage.getItem(COLLECTIONS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as Collection[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeCollections(items: Collection[]): void {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent(STORAGE_EVENT));
+  } catch {
+    /* ignore */
+  }
+}
+
+export const collectionsStore = {
+  list(): Collection[] {
+    return readCollections().sort((a, b) => a.createdAt - b.createdAt);
+  },
+
+  create(name: string): Collection | null {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+    const existing = readCollections();
+    // Avoid dupes — case-insensitive name match
+    const match = existing.find((c) => c.name.toLowerCase() === trimmed.toLowerCase());
+    if (match) return match;
+    const next: Collection = {
+      id: generateId(),
+      name: trimmed,
+      color: DEFAULT_COLORS[existing.length % DEFAULT_COLORS.length],
+      createdAt: Date.now(),
+    };
+    writeCollections([...existing, next]);
+    return next;
+  },
+
+  remove(id: string): void {
+    writeCollections(readCollections().filter((c) => c.id !== id));
+    // Also strip from every item that references it
+    const items = readAll();
+    const updated = items.map((it) =>
+      it.collections?.includes(id)
+        ? { ...it, collections: it.collections.filter((c) => c !== id) }
+        : it,
+    );
+    writeAll(updated);
+  },
+
+  rename(id: string, name: string): void {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    writeCollections(readCollections().map((c) => (c.id === id ? { ...c, name: trimmed } : c)));
+  },
+
+  /** Same subscribe stream as the library — both fire `STORAGE_EVENT`. */
+  subscribe(listener: () => void): () => void {
+    return libraryStore.subscribe(listener);
   },
 };
 

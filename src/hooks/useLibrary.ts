@@ -1,42 +1,68 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import { libraryStore, type LibraryItem } from '@/lib/library-store';
+import { libraryStore, collectionsStore, type LibraryItem, type Collection } from '@/lib/library-store';
 
-const EMPTY: LibraryItem[] = [];
+const EMPTY_ITEMS: LibraryItem[] = [];
+const EMPTY_COLLECTIONS: Collection[] = [];
 
-/**
- * Reactive subscription to the library store. Re-renders the consuming
- * component whenever an item is added, removed, updated, or storage changes
- * in another tab. SSR-safe (returns [] on the server).
- *
- * NOTE: useSyncExternalStore demands a STABLE snapshot reference between
- * renders unless the store actually changed — calling `libraryStore.list()`
- * would return a fresh sorted array every time and cause an infinite loop.
- * We cache the last list and only re-compute it after a real change.
- */
-let cachedSnapshot: LibraryItem[] = EMPTY;
-let needsRefresh = true;
+// ─── Library ───────────────────────────────────────────────────────────────
+//
+// useSyncExternalStore demands a STABLE snapshot reference between renders
+// unless the underlying store changed — calling `.list()` directly returns
+// a fresh sorted array every time and triggers an infinite loop. We cache
+// the snapshot and invalidate it only when the store dispatches a change.
 
-function getSnapshot(): LibraryItem[] {
-  if (needsRefresh) {
-    cachedSnapshot = libraryStore.list();
-    needsRefresh = false;
+let cachedItems: LibraryItem[] = EMPTY_ITEMS;
+let itemsDirty = true;
+
+function getItems(): LibraryItem[] {
+  if (itemsDirty) {
+    cachedItems = libraryStore.list();
+    itemsDirty = false;
   }
-  return cachedSnapshot;
+  return cachedItems;
 }
 
-function subscribe(onChange: () => void): () => void {
+function subscribeItems(onChange: () => void): () => void {
   return libraryStore.subscribe(() => {
-    needsRefresh = true;
+    itemsDirty = true;
     onChange();
   });
 }
 
-function getServerSnapshot(): LibraryItem[] {
-  return EMPTY;
+function getServerItems(): LibraryItem[] {
+  return EMPTY_ITEMS;
 }
 
 export function useLibrary(): LibraryItem[] {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(subscribeItems, getItems, getServerItems);
+}
+
+// ─── Collections ──────────────────────────────────────────────────────────
+
+let cachedCollections: Collection[] = EMPTY_COLLECTIONS;
+let collectionsDirty = true;
+
+function getCollections(): Collection[] {
+  if (collectionsDirty) {
+    cachedCollections = collectionsStore.list();
+    collectionsDirty = false;
+  }
+  return cachedCollections;
+}
+
+function subscribeCollections(onChange: () => void): () => void {
+  return collectionsStore.subscribe(() => {
+    collectionsDirty = true;
+    onChange();
+  });
+}
+
+function getServerCollections(): Collection[] {
+  return EMPTY_COLLECTIONS;
+}
+
+export function useCollections(): Collection[] {
+  return useSyncExternalStore(subscribeCollections, getCollections, getServerCollections);
 }

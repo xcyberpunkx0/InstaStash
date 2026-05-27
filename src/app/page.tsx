@@ -213,12 +213,12 @@ export default function Home() {
           href="/library"
           className="
             inline-flex items-center gap-2
-            px-4 py-2 rounded-[var(--radius-pill)]
-            bg-transparent border border-[var(--color-line-medium)]
-            text-[var(--color-ink-700)] no-underline
-            font-[family-name:var(--font-grotesk)] font-medium text-[13px]
-            hover:bg-[var(--color-paper-200)]
-            transition-colors duration-[160ms]
+            px-4 py-2 rounded-pill
+            bg-transparent border border-line-medium
+            text-ink-700 no-underline
+            font-grotesk font-medium text-[13px]
+            hover:bg-(--color-paper-200)
+            transition-colors duration-160
           "
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v1.5"/><path d="M13.9 17.45c-1.2-1.2-1.14-2.8-.2-3.73a2.43 2.43 0 0 1 3.44 0l.36.34.34-.34a2.43 2.43 0 0 1 3.45-.01v0c.95.95 1 2.53-.2 3.74L17.5 21Z"/></svg>
@@ -248,7 +248,7 @@ export default function Home() {
           {/* Eyebrow — Caveat */}
           <span
             style={{ ...CAVEAT_STYLE, transform: 'rotate(-2deg)' }}
-            className="text-[28px] text-[var(--color-terra-600)] inline-block mb-2"
+            className="text-[28px] text-(--color-terra-600) inline-block mb-2"
           >
             a quieter way to keep the internet —
           </span>
@@ -258,7 +258,7 @@ export default function Home() {
             style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
             className="text-[clamp(48px,8vw,96px)] leading-[0.96] tracking-[-0.02em] text-[var(--color-ink-900)] m-0 text-balance max-w-[14ch]"
           >
-            Save the internet, <span className="text-[var(--color-terra-500)]">beautifully.</span>
+            Save the internet, <span className="text-terra-500">beautifully.</span>
           </h1>
 
           <p className="text-[18px] leading-[1.55] text-[var(--color-ink-500)] max-w-[52ch] mt-6 mb-9">
@@ -411,56 +411,113 @@ export default function Home() {
       {/* ════════════════════════════════════════════════════════════════
           FOOTER
           ════════════════════════════════════════════════════════════════ */}
-      <footer className="max-w-[1280px] mx-auto px-6 md:px-12 py-8 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--color-line-soft)]">
-        <p style={CAVEAT_STYLE} className="text-[20px] text-[var(--color-ink-400)] m-0">
-          made with care, open-source forever.
-        </p>
+      {/* ════════════════════════════════════════════════════════════════
+          FOOTER — design-system multi-column layout
+          ════════════════════════════════════════════════════════════════ */}
+      <footer
+        className="max-w-[1280px] mx-auto px-6 md:px-12 pt-[60px] pb-12 bg-no-repeat bg-[position:top_center] bg-[size:100%_8px]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 8' preserveAspectRatio='none'><path d='M2 4 C 120 1.5, 240 6.5, 360 4 S 720 1.5, 840 4 1080 6.5, 1198 4' fill='none' stroke='%231F1B16' stroke-opacity='0.35' stroke-width='1.2' stroke-linecap='round'/></svg>")`,
+        }}
+      >
+        <div className="flex justify-between items-start gap-10 flex-wrap">
+          {/* Brand */}
+          <div className="flex-1 min-w-[240px]">
+            <img src="/assets/logo.svg" alt="AuraVault" className="h-8" />
+            <p className="text-[var(--color-ink-500)] text-[14px] max-w-[38ch] mt-3">
+              A quieter way to keep the internet. Made with care, open-source forever.
+            </p>
+          </div>
 
-        {/* Social links — github, linkedin, portfolio */}
-        <nav aria-label="Social links" className="flex items-center gap-1.5">
-          <a
-            href="https://github.com/xcyberpunkx0"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub"
-            title="GitHub"
-            className="w-9 h-9 rounded-full inline-flex items-center justify-center text-[var(--color-ink-500)] hover:text-[var(--color-ink-900)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
-          >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.49 3.18-1.18 3.18-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
-            </svg>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/aditya-gup1a/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            title="LinkedIn"
-            className="w-9 h-9 rounded-full inline-flex items-center justify-center text-[var(--color-ink-500)] hover:text-[var(--color-ink-900)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
-          >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.21 24 24 23.23 24 22.28V1.72C24 .77 23.21 0 22.22 0z"/>
-            </svg>
-          </a>
-          <a
-            href="https://www.adityagupta.space/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Portfolio"
-            title="Portfolio"
-            className="w-9 h-9 rounded-full inline-flex items-center justify-center text-[var(--color-ink-500)] hover:text-[var(--color-ink-900)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
-          >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M2 12h20"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </a>
-        </nav>
+          {/* Project */}
+          <div>
+            <h5 className="font-[family-name:var(--font-grotesk)] font-semibold text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-400)] m-0 mb-3">
+              Project
+            </h5>
+            <a
+              href="https://github.com/xcyberpunkx0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://github.com/xcyberpunkx0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              Source code
+            </a>
+            <a
+              href="/library"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              Your library
+            </a>
+          </div>
 
-        <p className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-ink-300)] m-0">
-          AuraVault · MIT licensed
-        </p>
+          {/* Connect */}
+          <div>
+            <h5 className="font-[family-name:var(--font-grotesk)] font-semibold text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-400)] m-0 mb-3">
+              Connect
+            </h5>
+            <a
+              href="https://github.com/xcyberpunkx0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://www.linkedin.com/in/aditya-gup1a/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://www.adityagupta.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              Portfolio
+            </a>
+          </div>
+
+          {/* Read */}
+          <div>
+            <h5 className="font-[family-name:var(--font-grotesk)] font-semibold text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-400)] m-0 mb-3">
+              Read
+            </h5>
+            <a
+              href="https://github.com/xcyberpunkx0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              Readme
+            </a>
+            <a
+              href="https://opensource.org/licenses/MIT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[var(--color-ink-700)] no-underline text-[14px] mb-1.5 hover:text-[var(--color-terra-600)] transition-colors duration-[160ms]"
+            >
+              License
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom bar — handwritten, matches the design system reference */}
+        <div className="mt-10 pt-[18px] flex justify-between items-center flex-wrap gap-2 font-[family-name:var(--font-hand)] text-[var(--color-ink-400)] text-[18px]">
+          <span>© {new Date().getFullYear()} · made by Aditya</span>
+          <span>★ MIT licensed</span>
+        </div>
       </footer>
     </main>
   );

@@ -58,16 +58,31 @@ export function VideoDetails({ title, formats, onDownload, url }: VideoDetailsPr
         </div>
 
         {/* Quality dropdown */}
-        <div className="relative">
-          <label className="block font-[family-name:var(--font-grotesk)] font-semibold text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-400)] mb-2">
-            Quality
-          </label>
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <label htmlFor="quality-select" className="font-[family-name:var(--font-grotesk)] font-semibold text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-400)]">
+              Quality
+            </label>
+            {/* Hand-drawn hint — clarifies that this is a dropdown */}
+            <span
+              aria-hidden="true"
+              style={{ fontFamily: 'var(--font-hand)', transform: 'rotate(-3deg)' }}
+              className="inline-flex items-center gap-1 text-[16px] text-[var(--color-terra-600)] whitespace-nowrap pointer-events-none select-none leading-none"
+            >
+              <svg className="w-5 h-3" viewBox="0 0 60 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M2 12 C 14 4, 30 20, 56 12" />
+                <path d="m50 6 6 6-6 6" />
+              </svg>
+              tap to change ✦
+            </span>
+          </div>
           <select
+            id="quality-select"
             value={selectedFormat}
             onChange={(e) => setSelectedFormat(e.target.value)}
             aria-label="Choose video quality"
             className="
-              px-4 py-3 pr-10
+              w-full px-4 py-3 pr-10
               bg-[var(--color-bg-recessed)] rounded-[var(--radius-md)]
               font-[family-name:var(--font-mono)] text-[15px] text-[var(--color-ink-900)]
               border border-[var(--color-line-medium)] outline-none cursor-pointer
@@ -85,18 +100,6 @@ export function VideoDetails({ title, formats, onDownload, url }: VideoDetailsPr
               </option>
             ))}
           </select>
-          {/* Hand-drawn hint — clarifies that this is a dropdown */}
-          <span
-            aria-hidden="true"
-            style={{ fontFamily: 'var(--font-hand)', transform: 'rotate(-3deg)' }}
-            className="absolute -top-1 -right-2 sm:right-auto sm:-left-[120px] sm:top-9 inline-flex items-center gap-1 text-[18px] text-[var(--color-terra-600)] whitespace-nowrap pointer-events-none select-none"
-          >
-            <svg className="hidden sm:block w-7 h-5 -rotate-12" viewBox="0 0 60 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 12 C 14 4, 30 20, 56 12" />
-              <path d="m50 6 6 6-6 6" />
-            </svg>
-            tap to change ✦
-          </span>
         </div>
       </div>
 
