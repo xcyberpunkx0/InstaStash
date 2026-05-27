@@ -92,14 +92,14 @@ export function ThemePicker({
         className={`
           group relative inline-flex items-center justify-center
           ${showLabel
-            ? 'gap-2 px-3 py-2 rounded-[var(--radius-pill)] text-[12px] font-medium hover:bg-[var(--color-paper-200)]'
-            : 'w-9 h-9 rounded-full hover:bg-[var(--color-paper-200)]'
+            ? 'gap-2 px-3 py-2 rounded-pill text-micro font-medium hover:bg-(--color-paper-200)'
+            : 'w-9 h-9 rounded-full hover:bg-(--color-paper-200)'
           }
-          bg-transparent border-0 text-[var(--color-ink-700)] cursor-pointer
-          transition-colors duration-[160ms]
+          bg-transparent border-0 text-ink-700 cursor-pointer
+          transition-colors duration-160
         `}
       >
-        <InkDrops swatches={swatches} className="w-[22px] h-[22px] transition-transform duration-[200ms] ease-[var(--ease-spring)] group-hover:rotate-[-8deg]" />
+        <InkDrops swatches={swatches} className="w-[22px] h-[22px] transition-transform duration-200 ease-spring group-hover:rotate-[-8deg]" />
         {showLabel && <span>{label}</span>}
       </button>
 
@@ -117,14 +117,14 @@ export function ThemePicker({
             className={`
               absolute z-50 ${POSITION[align]}
               w-[260px] p-2.5 rounded-[16px]
-              bg-[var(--color-bg-surface)]
-              border border-[var(--color-line-medium)]
+              bg-(--color-bg-surface)
+              border border-line-medium
               shadow-[0_24px_48px_-20px_rgba(15,17,23,0.35),0_0_0_1px_rgba(255,255,255,0.4)_inset]
             `}
           >
             <div
               style={{ fontFamily: 'var(--font-grotesk)' }}
-              className="px-2.5 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-400)]"
+              className="px-2.5 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-400"
             >
               Theme
             </div>
@@ -141,15 +141,15 @@ export function ThemePicker({
                     aria-label={`${t.name} theme`}
                     title={t.description}
                     className={`
-                      relative flex items-center gap-3 px-2.5 py-2 rounded-[10px] cursor-pointer text-left
-                      transition-[background-color] duration-[120ms]
-                      ${isActive ? 'bg-[var(--color-paper-200)]' : 'bg-transparent hover:bg-[var(--color-paper-200)]'}
+                      relative flex items-center gap-3 px-2.5 py-2 rounded-sm cursor-pointer text-left
+                      transition-[background-color] duration-120
+                      ${isActive ? 'bg-(--color-paper-200)' : 'bg-transparent hover:bg-(--color-paper-200)'}
                     `}
                   >
                     {/* Swatch tile — paper / ink / accent */}
                     <span
                       aria-hidden="true"
-                      className="relative w-7 h-7 rounded-[8px] overflow-hidden border border-[var(--color-line-soft)] shrink-0"
+                      className="relative w-7 h-7 rounded-[8px] overflow-hidden border border-line-soft shrink-0"
                       style={{ background: t.swatch.paper }}
                     >
                       <span className="absolute left-0 right-0 bottom-0 h-1/2" style={{ background: t.swatch.ink }} />
@@ -162,17 +162,17 @@ export function ThemePicker({
                     <span className="min-w-0 flex-1">
                       <span
                         style={{ fontFamily: 'var(--font-grotesk)' }}
-                        className="block text-[12px] font-semibold text-[var(--color-ink-900)] truncate"
+                        className="block text-micro font-semibold text-(--color-ink-900) truncate"
                       >
                         {t.name}
                       </span>
-                      <span className="block text-[10px] text-[var(--color-ink-500)] truncate">
+                      <span className="block text-[10px] text-(--color-ink-500) truncate">
                         {t.description}
                       </span>
                     </span>
 
                     {isActive && (
-                      <svg className="w-3.5 h-3.5 text-[var(--color-terra-600)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <svg className="w-3.5 h-3.5 text-(--color-terra-600) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     )}

@@ -32,7 +32,7 @@ export function ProgressBar({ value, variant = 'terra', label }: ProgressBarProp
       aria-label={label ?? `Progress: ${clamped}%`}
     >
       <div
-        className={`absolute left-0 top-0 bottom-0 rounded-pill shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition-[width] duration-[240ms] ease-[var(--ease-paper)] ${fillGradient}`}
+        className={`absolute left-0 top-0 bottom-0 rounded-pill shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition-[width] duration-240 ease-paper ${fillGradient}`}
         style={{ width: `${clamped}%` }}
       />
     </div>

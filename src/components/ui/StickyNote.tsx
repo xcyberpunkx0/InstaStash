@@ -30,7 +30,7 @@ export function StickyNote({ children, color = 'yellow', rotate = -3, className 
       className={`
         px-4 py-3.5
         text-[20px] leading-[1.15]
-        text-[var(--color-ink-700)]
+        text-ink-700
         rounded-[4px_14px_6px_12px]
         shadow-[0_14px_30px_-14px_rgba(31,27,22,0.35),inset_0_1px_0_rgba(255,255,255,0.45)]
         ${colors[color]}
