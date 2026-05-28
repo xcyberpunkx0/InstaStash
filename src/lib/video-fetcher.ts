@@ -2,6 +2,7 @@ import youtubeDlExec from 'youtube-dl-exec';
 import type { Platform, VideoFormat } from '@/types';
 import type { FetchErrorCode } from '@/types/errors';
 import { scrapeInstagramVideo } from './instagram-scraper';
+import { classifyYtDlpFormat, extractExpiry } from './format-classifier';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -22,6 +23,10 @@ interface YtDlpFormat {
   vcodec?: string;
   acodec?: string;
   format_note?: string;
+  // ─── Direct-CDN fields (used by format-classifier) ──────────────────
+  url?: string;
+  protocol?: string;
+  manifest_url?: string;
 }
 
 /** Raw output from yt-dlp --dump-json */
@@ -164,12 +169,16 @@ function mapYouTubeFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
     .sort(([a], [b]) => b - a)
     .map(([height, format]) => {
       const fileSize = format.filesize ?? format.filesize_approx ?? 0;
+      const classified = classifyYtDlpFormat(format);
       return {
         formatId: format.format_id,
         resolution: buildResolutionLabel(height),
         fileSize,
         ext: 'mp4',
         quality: buildQualityLabel(height, fileSize),
+        directUrl: classified.directUrl,
+        hasAudio: classified.hasAudio,
+        expiresAt: classified.expiresAt,
       };
     });
 
@@ -199,6 +208,7 @@ function mapInstagramFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
   if (!best) return [];
 
   const fileSize = best.filesize ?? best.filesize_approx ?? 0;
+  const classified = classifyYtDlpFormat(best);
   return [
     {
       formatId: best.format_id,
@@ -206,6 +216,9 @@ function mapInstagramFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
       fileSize,
       ext: best.ext || 'mp4',
       quality: bestHeight > 0 ? buildQualityLabel(bestHeight, fileSize) : 'Original',
+      directUrl: classified.directUrl,
+      hasAudio: classified.hasAudio,
+      expiresAt: classified.expiresAt,
     },
   ];
 }
@@ -233,6 +246,10 @@ export class VideoFetcher {
             fileSize: 0,
             ext: 'mp4',
             quality: 'Original',
+            // Scraper gives us a CDN URL — fast path is available.
+            directUrl: scraped.videoUrl,
+            hasAudio: true,
+            expiresAt: extractExpiry(scraped.videoUrl),
           }],
         };
       } catch {

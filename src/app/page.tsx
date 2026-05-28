@@ -13,6 +13,7 @@ import { ThemePicker } from '@/components/ThemeSwitcher';
 import { SketchArrow, SketchStar, DoodleSpiral, DoodleCircles } from '@/components/ui/SketchMarks';
 import { useRetryState } from '@/hooks/useRetryState';
 import { libraryStore } from '@/lib/library-store';
+import { smartDownload } from '@/lib/downloader-client';
 import type { AppState, DetectResponse, FetchResponse, VideoQuality } from '@/types';
 import type { DetectErrorResponse, FetchErrorResponse } from '@/types/errors';
 
@@ -113,63 +114,44 @@ export default function Home() {
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
+
+    const meta = state.fetch.status === 'fetched' ? state.fetch.metadata : undefined;
+    const fmt = meta?.formats.find((f) => f.formatId === formatId) ?? meta?.formats[0];
+    const platform = state.detection.status === 'detected' ? state.detection.result.platform : 'unknown';
+
     try {
-      const response = await fetch('/api/download', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: state.url, formatId }), signal: controller.signal });
-      if (!response.ok || !response.body) { dispatch({ type: 'DOWNLOAD_ERROR', error: 'Failed to start download' }); return; }
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n\n');
-        buffer = lines.pop() ?? '';
-        for (const line of lines) {
-          const dataLine = line.trim();
-          if (!dataLine.startsWith('data: ')) continue;
-          try {
-            const eventData = JSON.parse(dataLine.slice(6));
-            switch (eventData.type) {
-              case 'progress': dispatch({ type: 'DOWNLOAD_PROGRESS', percentage: eventData.percentage }); break;
-              case 'file': {
-                const byteString = atob(eventData.data);
-                const bytes = new Uint8Array(byteString.length);
-                for (let i = 0; i < byteString.length; i++) bytes[i] = byteString.charCodeAt(i);
-                const blob = new Blob([bytes], { type: eventData.mimeType || 'video/mp4' });
-                const downloadUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl; a.download = eventData.filename || 'video.mp4';
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                URL.revokeObjectURL(downloadUrl);
-                dispatch({ type: 'DOWNLOAD_COMPLETE', filename: eventData.filename });
-                // Save to library — best-effort, never block the UI
-                try {
-                  const meta = state.fetch.status === 'fetched' ? state.fetch.metadata : undefined;
-                  const platform = state.detection.status === 'detected' ? state.detection.result.platform : 'unknown';
-                  const fmt = meta?.formats.find((f) => f.formatId === formatId) ?? meta?.formats[0];
-                  libraryStore.add({
-                    url: state.url,
-                    title: meta?.title ?? eventData.filename ?? 'Untitled',
-                    platform,
-                    thumbnail: meta?.thumbnail,
-                    duration: meta?.duration,
-                    fileSize: fmt?.fileSize,
-                    resolution: fmt?.resolution,
-                    format: fmt?.ext,
-                    filename: eventData.filename ?? 'video.mp4',
-                  });
-                } catch { /* swallow — library write is non-critical */ }
-                break;
-              }
-              case 'error': dispatch({ type: 'DOWNLOAD_ERROR', error: eventData.message }); break;
-            }
-          } catch { /* skip */ }
-        }
-      }
+      const result = await smartDownload(
+        {
+          srcUrl: state.url,
+          formatId,
+          directUrl: fmt?.directUrl,
+          hasAudio: fmt?.hasAudio,
+          ext: fmt?.ext,
+        },
+        (pct) => dispatch({ type: 'DOWNLOAD_PROGRESS', percentage: pct }),
+        controller.signal,
+      );
+
+      dispatch({ type: 'DOWNLOAD_COMPLETE', filename: result.filename });
+
+      // Save to library — best-effort, never block the UI
+      try {
+        libraryStore.add({
+          url: state.url,
+          title: meta?.title ?? result.filename ?? 'Untitled',
+          platform,
+          thumbnail: meta?.thumbnail,
+          duration: meta?.duration,
+          fileSize: fmt?.fileSize || result.bytes,
+          resolution: fmt?.resolution,
+          format: fmt?.ext,
+          filename: result.filename,
+        });
+      } catch { /* swallow — library write is non-critical */ }
     } catch (err: unknown) {
-      if (err instanceof Error && err.name === 'AbortError') return;
-      dispatch({ type: 'DOWNLOAD_ERROR', error: 'Download failed — please try again.' });
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      const message = err instanceof Error ? err.message : 'Download failed — please try again.';
+      dispatch({ type: 'DOWNLOAD_ERROR', error: message });
     }
   }, [state.url, state.fetch, state.detection]);
 

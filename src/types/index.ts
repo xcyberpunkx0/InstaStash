@@ -50,6 +50,18 @@ export interface VideoFormat {
   fileSize: number;
   ext: string;
   quality: string;
+
+  // ─── Direct-CDN download hints (Option A3) ────────────────────────────
+  // When present, the browser can save the file directly from the platform CDN
+  // without us proxying the bytes. See `src/lib/format-classifier.ts` for the
+  // rules that populate these fields.
+
+  /** Signed CDN URL valid for ~hours. Only set when this is a muxed, progressive HTTP stream. */
+  directUrl?: string;
+  /** True if the stream contains audio (combined-AV or audio-only). */
+  hasAudio?: boolean;
+  /** Epoch ms when `directUrl` is expected to expire, if extractable. */
+  expiresAt?: number;
 }
 
 /** A quality option presented to the user in the UI */
