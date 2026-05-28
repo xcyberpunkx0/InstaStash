@@ -16,9 +16,9 @@ export function DownloadComplete({ filename, onDownloadAnother, onSaveAgain }: D
   return (
     <div className="flex flex-col items-center gap-4 py-6" role="status" aria-live="polite">
       {/* Checkmark icon */}
-      <div className="w-16 h-16 rounded-full bg-[var(--color-sage-200)] flex items-center justify-center">
+      <div className="w-16 h-16 rounded-full bg-sage-200 flex items-center justify-center">
         <svg
-          className="w-8 h-8 text-[var(--color-sage-600)]"
+          className="w-8 h-8 text-sage-600"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -34,12 +34,12 @@ export function DownloadComplete({ filename, onDownloadAnother, onSaveAgain }: D
       <div className="text-center">
         <p
           style={{ fontFamily: 'var(--font-hand)', fontWeight: 500 }}
-          className="text-[28px] text-[var(--color-sage-600)] leading-none"
+          className="text-[28px] text-sage-600 leading-none"
         >
           tucked away safely ✦
         </p>
         {filename && (
-          <p className="mt-2 font-[family-name:var(--font-mono)] text-[12px] text-[var(--color-ink-400)]">
+          <p className="mt-2 font-mono text-micro text-ink-400">
             {filename}
           </p>
         )}
@@ -53,8 +53,8 @@ export function DownloadComplete({ filename, onDownloadAnother, onSaveAgain }: D
             onClick={onSaveAgain}
             className="
               inline-flex items-center gap-2
-              px-5 py-2.5 rounded-[var(--radius-pill)]
-              bg-transparent border border-[var(--color-line-medium)]
+              px-5 py-2.5 rounded-pill
+              bg-transparent border border-line-medium
               text-[var(--color-ink-700)]
               font-[family-name:var(--font-grotesk)] font-semibold text-[13px]
               cursor-pointer
