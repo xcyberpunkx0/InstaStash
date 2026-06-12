@@ -6,6 +6,7 @@ import { createReadStream } from 'fs';
 import { mkdtemp, readdir, rm, stat } from 'fs/promises';
 import { Readable } from 'stream';
 import { platformDetector, isDetectSuccess } from '@/lib/platform-detector';
+import { getCookieArgs } from '@/lib/ytdlp-cookies';
 import type { DownloadRequest } from '@/types';
 
 /**
@@ -206,6 +207,7 @@ function downloadWithYtDlp(
       '--no-playlist',
       '--max-filesize', MAX_FILESIZE,
       '--merge-output-format', 'mp4',
+      ...getCookieArgs(),
       url,
     ];
 

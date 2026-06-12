@@ -4,7 +4,7 @@ import { POST } from './route';
 import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 
-const { mockSpawn, mockMkdtemp, mockReaddir, mockRm, mockStat, mockCreateReadStream } = vi.hoisted(() => {
+const { mockSpawn, mockMkdtemp, mockReaddir, mockRm, mockStat, mockCreateReadStream, mockExistsSync } = vi.hoisted(() => {
   return {
     mockSpawn: vi.fn(),
     mockMkdtemp: vi.fn(),
@@ -12,6 +12,7 @@ const { mockSpawn, mockMkdtemp, mockReaddir, mockRm, mockStat, mockCreateReadStr
     mockRm: vi.fn(),
     mockStat: vi.fn(),
     mockCreateReadStream: vi.fn(),
+    mockExistsSync: vi.fn(),
   };
 });
 
@@ -21,7 +22,7 @@ vi.mock('child_process', () => {
 });
 
 vi.mock('fs', () => {
-  const m = { createReadStream: mockCreateReadStream };
+  const m = { createReadStream: mockCreateReadStream, existsSync: mockExistsSync };
   return { ...m, default: m };
 });
 
@@ -264,6 +265,21 @@ describe('POST /api/download', () => {
       ]),
       expect.any(Object),
     );
+  });
+
+  it('passes --cookies to yt-dlp when INSTAGRAM_COOKIES_FILE is set', async () => {
+    vi.stubEnv('INSTAGRAM_COOKIES_FILE', '/etc/secrets/ig-cookies.txt');
+    mockExistsSync.mockReturnValue(true);
+    mockSuccessfulDownload();
+
+    await POST(createRequest({ url: 'https://instagram.com/reel/test/', formatId: 'best' }));
+
+    expect(mockSpawn).toHaveBeenCalledWith(
+      'yt-dlp',
+      expect.arrayContaining(['--cookies', '/etc/secrets/ig-cookies.txt']),
+      expect.any(Object),
+    );
+    vi.unstubAllEnvs();
   });
 
   it('cleans up the temp dir on failure', async () => {

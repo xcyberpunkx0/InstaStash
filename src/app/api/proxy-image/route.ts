@@ -1,10 +1,14 @@
 import { NextRequest } from 'next/server';
+import { fetchFromCdn, CdnUrlError } from '@/lib/safe-cdn-fetch';
 
 /**
  * GET /api/proxy-image?url=...
  *
  * Proxies Instagram thumbnail/poster images through our server to bypass
  * CDN hotlinking blocks (CORS / Referer check rejections).
+ *
+ * Restricted to Instagram/Facebook CDN hostnames (including redirect hops)
+ * to prevent SSRF / open-proxy abuse.
  */
 export async function GET(request: NextRequest): Promise<Response> {
   const url = request.nextUrl.searchParams.get('url');
@@ -14,11 +18,9 @@ export async function GET(request: NextRequest): Promise<Response> {
   }
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        // Pretend to be a standard browser request
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      },
+    const response = await fetchFromCdn(url, {
+      // Pretend to be a standard browser request
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     });
 
     if (!response.ok) {
@@ -36,6 +38,9 @@ export async function GET(request: NextRequest): Promise<Response> {
       },
     });
   } catch (error) {
+    if (error instanceof CdnUrlError) {
+      return new Response(error.message, { status: 403 });
+    }
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(`Error proxying image: ${message}`, { status: 500 });
   }

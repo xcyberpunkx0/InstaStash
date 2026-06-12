@@ -3,6 +3,7 @@ import type { Platform, VideoFormat } from '@/types';
 import type { FetchErrorCode } from '@/types/errors';
 import { scrapeInstagramVideo } from './instagram-scraper';
 import { classifyYtDlpFormat, extractExpiry } from './format-classifier';
+import { getCookieOptions } from './ytdlp-cookies';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -295,6 +296,7 @@ export class VideoFetcher {
       noCheckCertificates: true,
       preferFreeFormats: false,
       skipDownload: true,
+      ...getCookieOptions(),
     });
 
     // youtube-dl-exec returns the parsed JSON when dumpSingleJson is used
