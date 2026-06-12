@@ -5,14 +5,11 @@ import type { DetectErrorResponse } from '@/types/errors';
 
 const DETECTION_TIMEOUT_MS = 1000;
 
-const SUPPORTED_PLATFORMS = ['Instagram', 'YouTube'];
+const SUPPORTED_PLATFORMS = ['Instagram'];
 
 const EXAMPLE_FORMATS = [
   'https://www.instagram.com/p/ABC123/',
   'https://www.instagram.com/reel/ABC123/',
-  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  'https://youtu.be/dQw4w9WgXcQ',
-  'https://www.youtube.com/shorts/dQw4w9WgXcQ',
 ];
 
 export async function POST(request: NextRequest): Promise<NextResponse<DetectResponse | DetectErrorResponse>> {
@@ -66,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DetectRes
 
     // Fallback - should not reach here
     const errorResponse: DetectErrorResponse = {
-      error: "We don't recognize this URL. We support Instagram and YouTube!",
+      error: "We don't recognize this URL. We support Instagram!",
       code: 'UNSUPPORTED_PLATFORM',
       supportedPlatforms: SUPPORTED_PLATFORMS,
       exampleFormats: EXAMPLE_FORMATS,
@@ -84,7 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DetectRes
 
     // Unexpected error
     const errorResponse: DetectErrorResponse = {
-      error: "We don't recognize this URL. We support Instagram and YouTube!",
+      error: "We don't recognize this URL. We support Instagram!",
       code: 'UNSUPPORTED_PLATFORM',
       supportedPlatforms: SUPPORTED_PLATFORMS,
       exampleFormats: EXAMPLE_FORMATS,

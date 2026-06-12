@@ -16,11 +16,11 @@ export function Navbar() {
               key={link}
               href={`#${link.replace(/\s/g, '-')}`}
               className="
-                text-[var(--color-ink-700)] no-underline text-[15px]
-                font-[family-name:var(--font-sans)]
+                text-(--color-ink-700) no-underline text-[15px]
+                font-sans
                 bg-[linear-gradient(transparent_calc(100%-2px),var(--color-terra-500)_0)]
                 bg-no-repeat bg-[length:0%_100%]
-                transition-[background-size] duration-[320ms] ease-[var(--ease-paper)]
+                transition-[background-size] duration-[320ms] ease-(--ease-paper)
                 hover:bg-[length:100%_100%]
                 pb-0.5
               "
@@ -34,12 +34,12 @@ export function Navbar() {
           href="#download"
           className="
             inline-flex items-center gap-2
-            bg-[var(--color-ink-900)] text-[var(--color-paper-50)]
-            px-5 py-[11px] rounded-[var(--radius-pill)]
-            font-[family-name:var(--font-grotesk)] font-semibold text-[14px]
+            bg-(--color-ink-900) text-(--color-paper-50)
+            px-5 py-[11px] rounded-pill
+            font-grotesk font-semibold text-small
             no-underline border-0 cursor-pointer
             shadow-[0_8px_20px_-10px_rgba(31,27,22,0.45)]
-            transition-transform duration-[160ms] ease-[var(--ease-paper)]
+            transition-transform duration-[160ms] ease-(--ease-paper)
             hover:translate-y-[-1px]
           "
         >

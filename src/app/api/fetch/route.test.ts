@@ -46,29 +46,6 @@ describe('POST /api/fetch', () => {
   });
 
   describe('successful responses', () => {
-    it('should return video metadata for a valid YouTube request', async () => {
-      mockFetchMetadata.mockResolvedValue({
-        title: 'Test Video',
-        duration: 300,
-        thumbnail: 'https://img.youtube.com/thumb.jpg',
-        formats: [
-          { formatId: '137', resolution: '1080p', fileSize: 90000000, ext: 'mp4', quality: '1080p HD (~86MB)' },
-          { formatId: '22', resolution: '720p', fileSize: 45000000, ext: 'mp4', quality: '720p HD (~43MB)' },
-        ],
-      });
-
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=abc123', platform: 'youtube' });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.title).toBe('Test Video');
-      expect(data.duration).toBe(300);
-      expect(data.thumbnail).toBe('https://img.youtube.com/thumb.jpg');
-      expect(data.formats).toHaveLength(2);
-      expect(data.formats[0].resolution).toBe('1080p');
-    });
-
     it('should return video metadata for a valid Instagram request', async () => {
       mockFetchMetadata.mockResolvedValue({
         title: 'Instagram Reel',
@@ -94,11 +71,11 @@ describe('POST /api/fetch', () => {
         duration: 60,
         thumbnail: '',
         formats: [
-          { formatId: '18', resolution: '360p', fileSize: 10000000, ext: 'mp4', quality: '360p (~10MB)' },
+          { formatId: '0', resolution: '360p', fileSize: 10000000, ext: 'mp4', quality: '360p (~10MB)' },
         ],
       });
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=nothumb', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/p/nothumb', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -114,10 +91,10 @@ describe('POST /api/fetch', () => {
         formats: [],
       });
 
-      const request = createRequest({ url: '  https://www.youtube.com/watch?v=trim  ', platform: 'youtube' });
+      const request = createRequest({ url: '  https://www.instagram.com/reel/trim  ', platform: 'instagram' });
       await POST(request);
 
-      expect(mockFetchMetadata).toHaveBeenCalledWith('https://www.youtube.com/watch?v=trim', 'youtube');
+      expect(mockFetchMetadata).toHaveBeenCalledWith('https://www.instagram.com/reel/trim', 'instagram');
     });
   });
 
@@ -137,7 +114,7 @@ describe('POST /api/fetch', () => {
     });
 
     it('should return 400 for missing url', async () => {
-      const request = createRequest({ platform: 'youtube' });
+      const request = createRequest({ platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -146,7 +123,7 @@ describe('POST /api/fetch', () => {
     });
 
     it('should return 400 for empty url', async () => {
-      const request = createRequest({ url: '   ', platform: 'youtube' });
+      const request = createRequest({ url: '   ', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -155,7 +132,7 @@ describe('POST /api/fetch', () => {
     });
 
     it('should return 400 for missing platform', async () => {
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=abc' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/abc' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -171,6 +148,15 @@ describe('POST /api/fetch', () => {
       expect(response.status).toBe(400);
       expect(data.error).toContain('Platform');
     });
+
+    it('should return 400 for youtube as platform (unsupported now)', async () => {
+      const request = createRequest({ url: 'https://www.youtube.com/watch?v=abc', platform: 'youtube' });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toContain('Platform');
+    });
   });
 
   describe('VideoFetchError responses', () => {
@@ -179,7 +165,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('This content is private.', 'PRIVATE')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=priv', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/p/priv', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -193,7 +179,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Age-restricted content.', 'AGE_RESTRICTED')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=age', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/age', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -206,7 +192,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Not available in your region.', 'GEO_BLOCKED')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=geo', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/geo', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -219,7 +205,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Content no longer available.', 'UNAVAILABLE')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=gone', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/gone', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -232,7 +218,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Video too long.', 'DURATION_EXCEEDED')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=long', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/long', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -245,7 +231,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Too many requests.', 'RATE_LIMITED', 120)
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=rate', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/rate', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -259,7 +245,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Private content.', 'PRIVATE')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=priv2', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/p/priv2', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -271,7 +257,7 @@ describe('POST /api/fetch', () => {
         new VideoFetchError('Connection failed.', 'NETWORK_ERROR')
       );
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=net', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/net', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 
@@ -284,7 +270,7 @@ describe('POST /api/fetch', () => {
     it('should return 502 for non-VideoFetchError exceptions', async () => {
       mockFetchMetadata.mockRejectedValue(new Error('Something unexpected'));
 
-      const request = createRequest({ url: 'https://www.youtube.com/watch?v=err', platform: 'youtube' });
+      const request = createRequest({ url: 'https://www.instagram.com/reel/err', platform: 'instagram' });
       const response = await POST(request);
       const data = await response.json();
 

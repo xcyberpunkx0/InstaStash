@@ -21,7 +21,7 @@ export class PlatformDetector {
       return {
         error: 'Please paste a video URL to get started!',
         code: 'EMPTY_URL' as DetectErrorCode,
-        supportedPlatforms: ['Instagram', 'YouTube'],
+        supportedPlatforms: ['Instagram'],
       };
     }
 
@@ -51,67 +51,27 @@ export class PlatformDetector {
       };
     }
 
-    // Try YouTube patterns
-    const youtubeVideo = URL_PATTERNS.youtube.video.exec(normalizedUrl);
-    if (youtubeVideo) {
-      const videoId = youtubeVideo[2];
-      return {
-        platform: 'youtube',
-        contentType: 'video',
-        videoId,
-        normalizedUrl,
-      };
-    }
-
-    const youtubeShort = URL_PATTERNS.youtube.short.exec(normalizedUrl);
-    if (youtubeShort) {
-      const videoId = youtubeShort[2];
-      return {
-        platform: 'youtube',
-        contentType: 'short',
-        videoId,
-        normalizedUrl,
-      };
-    }
-
-    const youtubeShortUrl = URL_PATTERNS.youtube.shortUrl.exec(normalizedUrl);
-    if (youtubeShortUrl) {
-      const videoId = youtubeShortUrl[1];
-      return {
-        platform: 'youtube',
-        contentType: 'video',
-        videoId,
-        normalizedUrl,
-      };
-    }
-
     // Check if it's a supported domain but invalid path
     if (this.isSupportedDomain(normalizedUrl)) {
       return {
         error: "This doesn't look like a video link. Check the URL?",
         code: 'INVALID_FORMAT' as DetectErrorCode,
-        supportedPlatforms: ['Instagram', 'YouTube'],
+        supportedPlatforms: ['Instagram'],
         exampleFormats: [
           'https://www.instagram.com/p/ABC123/',
           'https://www.instagram.com/reel/ABC123/',
-          'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-          'https://youtu.be/dQw4w9WgXcQ',
-          'https://www.youtube.com/shorts/dQw4w9WgXcQ',
         ],
       };
     }
 
     // Unsupported platform
     return {
-      error: "We don't recognize this URL. We support Instagram and YouTube!",
+      error: "We don't recognize this URL. We support Instagram!",
       code: 'UNSUPPORTED_PLATFORM' as DetectErrorCode,
-      supportedPlatforms: ['Instagram', 'YouTube'],
+      supportedPlatforms: ['Instagram'],
       exampleFormats: [
         'https://www.instagram.com/p/ABC123/',
         'https://www.instagram.com/reel/ABC123/',
-        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        'https://youtu.be/dQw4w9WgXcQ',
-        'https://www.youtube.com/shorts/dQw4w9WgXcQ',
       ],
     };
   }
@@ -178,19 +138,6 @@ export class PlatformDetector {
 
       const reelMatch = URL_PATTERNS.instagram.reel.exec(normalizedUrl);
       if (reelMatch) return reelMatch[2];
-
-      return null;
-    }
-
-    if (platform === 'youtube') {
-      const videoMatch = URL_PATTERNS.youtube.video.exec(normalizedUrl);
-      if (videoMatch) return videoMatch[2];
-
-      const shortMatch = URL_PATTERNS.youtube.short.exec(normalizedUrl);
-      if (shortMatch) return shortMatch[2];
-
-      const shortUrlMatch = URL_PATTERNS.youtube.shortUrl.exec(normalizedUrl);
-      if (shortUrlMatch) return shortUrlMatch[1];
 
       return null;
     }

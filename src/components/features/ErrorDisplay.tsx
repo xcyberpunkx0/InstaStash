@@ -20,7 +20,7 @@ export function ErrorDisplay({ message, onRetry, retryDisabled, countdown }: Err
       {/* Error icon */}
       <div className="w-12 h-12 rounded-full bg-[#F2D5D2] flex items-center justify-center">
         <svg
-          className="w-5 h-5 text-[var(--color-rouge-500)]"
+          className="w-5 h-5 text-rouge-500"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -35,12 +35,12 @@ export function ErrorDisplay({ message, onRetry, retryDisabled, countdown }: Err
         </svg>
       </div>
 
-      <p className="font-[family-name:var(--font-sans)] text-[15px] text-[var(--color-rouge-500)] max-w-[400px]">
+      <p className="font-sans text-[15px] text-rouge-500 max-w-[400px]">
         {message}
       </p>
 
       {countdown !== undefined && countdown > 0 && (
-        <p className="font-[family-name:var(--font-hand)] text-[20px] text-[var(--color-ink-400)]" aria-live="polite">
+        <p className="font-hand text-[20px] text-(--color-ink-400)" aria-live="polite">
           retry in {countdown}s...
         </p>
       )}

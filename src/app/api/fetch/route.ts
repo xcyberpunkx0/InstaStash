@@ -17,7 +17,7 @@ const ERROR_STATUS_CODES: Record<FetchErrorCode, number> = {
 
 // ─── Validation ──────────────────────────────────────────────────────────────
 
-const VALID_PLATFORMS: Platform[] = ['instagram', 'youtube'];
+const VALID_PLATFORMS: Platform[] = ['instagram'];
 
 function isValidPlatform(value: unknown): value is Platform {
   return typeof value === 'string' && VALID_PLATFORMS.includes(value as Platform);
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Validate platform field
   if (!isValidPlatform(platform)) {
     return NextResponse.json(
-      { error: 'Platform must be "instagram" or "youtube".', code: 'NETWORK_ERROR' } satisfies FetchErrorResponse,
+      { error: 'Platform must be "instagram".', code: 'NETWORK_ERROR' } satisfies FetchErrorResponse,
       { status: 400 }
     );
   }
@@ -65,6 +65,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       thumbnail: metadata.thumbnail || undefined,
       duration: metadata.duration,
       formats: metadata.formats,
+      previewVideoUrl: metadata.previewVideoUrl,
     };
 
     return NextResponse.json(response, { status: 200 });

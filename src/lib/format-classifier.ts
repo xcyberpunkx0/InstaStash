@@ -15,6 +15,8 @@
 // fall back to the proxy path. This module never throws.
 
 export interface RawFormatLike {
+  /** yt-dlp's format ID (e.g. '1', 'dash-1234') */
+  format_id?: string;
   /** yt-dlp's resolved direct URL for this format, when available. */
   url?: string;
   /** Audio codec ('none' for video-only). */
@@ -45,8 +47,18 @@ export function classifyYtDlpFormat(raw: RawFormatLike): ClassifiedFormat {
   const acodec = (raw.acodec ?? '').toLowerCase();
   const vcodec = (raw.vcodec ?? '').toLowerCase();
 
-  const hasAudioStream = acodec !== '' && acodec !== 'none';
-  const hasVideoStream = vcodec !== '' && vcodec !== 'none';
+  let hasAudioStream = acodec !== '' && acodec !== 'none';
+  let hasVideoStream = vcodec !== '' && vcodec !== 'none';
+
+  // Instagram progressive format '1' has both audio and video muxed, but lacks codec metadata in yt-dlp output
+  if (
+    raw.format_id === '1' ||
+    (raw.acodec === undefined && raw.vcodec === undefined && raw.ext === 'mp4' && !raw.manifest_url)
+  ) {
+    hasAudioStream = true;
+    hasVideoStream = true;
+  }
+
   // "hasAudio" in our terminology = "browser can save without merging".
   // True for muxed video+audio AND for pure audio formats.
   const hasAudio = hasAudioStream;

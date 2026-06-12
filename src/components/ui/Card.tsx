@@ -14,15 +14,15 @@ export interface CardProps {
  */
 export function Card({ children, className = '', hover = false }: CardProps) {
   const base = `
-    bg-[var(--color-bg-surface)]
+    bg-(--color-bg-surface)
     bg-blend-multiply
-    rounded-[var(--radius-lg)]
-    border border-[var(--color-line-soft)]
-    shadow-[var(--shadow-card)]
+    rounded-lg
+    border border-line-soft
+    shadow-(--shadow-card)
   `;
 
   const hoverStyles = hover
-    ? 'transition-[transform,box-shadow] duration-[240ms] ease-[var(--ease-paper)] hover:translate-y-[-3px] hover:shadow-[var(--shadow-lift)]'
+    ? 'transition-[transform,box-shadow] duration-[240ms] ease-(--ease-paper) hover:translate-y-[-3px] hover:shadow-(--shadow-lift)'
     : '';
 
   return (

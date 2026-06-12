@@ -13,13 +13,13 @@ export function FetchingState({ message = 'looking for the file...' }: { message
       <div className="flex justify-between items-baseline">
         <span
           style={{ fontFamily: 'var(--font-hand)', fontWeight: 500 }}
-          className="text-[24px] text-[var(--color-ink-700)]"
+          className="text-[24px] text-(--color-ink-700)"
         >
           {message}
         </span>
         <span
           style={{ fontFamily: 'var(--font-hand)', fontWeight: 500 }}
-          className="text-[20px] text-[var(--color-ink-300)]"
+          className="text-[20px] text-(--color-ink-300)"
         >
           — —
         </span>
@@ -51,11 +51,11 @@ export function FetchingState({ message = 'looking for the file...' }: { message
         <div>
           <div
             style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
-            className="text-[22px] leading-tight text-[var(--color-ink-900)]"
+            className="text-h3 leading-tight text-(--color-ink-900)"
           >
             One moment
           </div>
-          <div className="font-[family-name:var(--font-sans)] text-[13px] text-[var(--color-ink-400)]">
+          <div className="font-sans text-[13px] text-(--color-ink-400)">
             fetching the video info...
           </div>
         </div>

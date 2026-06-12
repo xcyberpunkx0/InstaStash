@@ -8,12 +8,12 @@
 
 ## TL;DR
 
-| Path | Today | After |
-|---|---|---|
-| Instagram reel/post | `yt-dlp` → temp file → base64 over SSE → blob in browser | Backend extracts CDN URL → browser fetches direct from `cdninstagram.com` |
-| YouTube ≤720p combined (itag 18, 22) | yt-dlp + proxy | Direct redirect to `googlevideo.com` |
-| YouTube 1080p+ (split video+audio) | yt-dlp + ffmpeg merge + proxy | Same as today (no change) |
-| YouTube audio-only (mp3) | yt-dlp + transcode + proxy | Same as today (no change) |
+| Path                                 | Today                                                    | After                                                                     |
+| ------------------------------------ | -------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Instagram reel/post                  | `yt-dlp` → temp file → base64 over SSE → blob in browser | Backend extracts CDN URL → browser fetches direct from `cdninstagram.com` |
+| YouTube ≤720p combined (itag 18, 22) | yt-dlp + proxy                                           | Direct redirect to `googlevideo.com`                                      |
+| YouTube 1080p+ (split video+audio)   | yt-dlp + ffmpeg merge + proxy                            | Same as today (no change)                                                 |
+| YouTube audio-only (mp3)             | yt-dlp + transcode + proxy                               | Same as today (no change)                                                 |
 
 Most user traffic (Instagram + sub-720p YouTube) stops touching our bandwidth. The
 heavy paths stay proxied so feature parity is preserved.
@@ -72,9 +72,9 @@ export interface VideoFormat {
   quality: string;
 
   // NEW — only present when a direct download is possible
-  directUrl?: string;       // signed CDN URL, valid for ~hours
-  hasAudio?: boolean;       // true if this format is muxed (browser can save it as-is)
-  expiresAt?: number;       // epoch ms; UI can warn if user dawdles
+  directUrl?: string; // signed CDN URL, valid for ~hours
+  hasAudio?: boolean; // true if this format is muxed (browser can save it as-is)
+  expiresAt?: number; // epoch ms; UI can warn if user dawdles
 }
 ```
 
@@ -93,16 +93,16 @@ testable.
 
 ### Files that change
 
-| File | Change |
-|---|---|
-| `src/types/index.ts` | Add `directUrl`, `hasAudio`, `expiresAt` to `VideoFormat`. |
-| `src/lib/video-fetcher.ts` | When mapping yt-dlp formats, populate the new fields via `format-classifier`. For Instagram, attach the scraped `videoUrl` as `directUrl` on the single returned format. |
-| `src/lib/instagram-scraper.ts` | No logic change. Re-export `InstagramVideoData` so the fetcher can pass `videoUrl` through cleanly. |
-| `src/app/api/fetch/route.ts` | No code change — type widening flows through automatically. |
-| `src/app/api/download/route.ts` | Unchanged. Stays as the proxy fallback. |
-| `src/app/page.tsx` (`handleDownload`) | Branch: if selected format has `directUrl && hasAudio`, do client-side download (fetch + Blob for progress UX, or `<a download>` for zero-overhead). Library write happens on success either way. |
-| `src/components/features/QualityPicker.tsx` (or equivalent) | Optionally show a small "fast" badge on direct-download formats. Optional, cosmetic. |
-| `src/lib/format-classifier.test.ts` (new) | Vitest unit tests for the classifier. |
+| File                                                        | Change                                                                                                                                                                                            |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/types/index.ts`                                        | Add `directUrl`, `hasAudio`, `expiresAt` to `VideoFormat`.                                                                                                                                        |
+| `src/lib/video-fetcher.ts`                                  | When mapping yt-dlp formats, populate the new fields via `format-classifier`. For Instagram, attach the scraped `videoUrl` as `directUrl` on the single returned format.                          |
+| `src/lib/instagram-scraper.ts`                              | No logic change. Re-export `InstagramVideoData` so the fetcher can pass `videoUrl` through cleanly.                                                                                               |
+| `src/app/api/fetch/route.ts`                                | No code change — type widening flows through automatically.                                                                                                                                       |
+| `src/app/api/download/route.ts`                             | Unchanged. Stays as the proxy fallback.                                                                                                                                                           |
+| `src/app/page.tsx` (`handleDownload`)                       | Branch: if selected format has `directUrl && hasAudio`, do client-side download (fetch + Blob for progress UX, or `<a download>` for zero-overhead). Library write happens on success either way. |
+| `src/components/features/QualityPicker.tsx` (or equivalent) | Optionally show a small "fast" badge on direct-download formats. Optional, cosmetic.                                                                                                              |
+| `src/lib/format-classifier.test.ts` (new)                   | Vitest unit tests for the classifier.                                                                                                                                                             |
 
 ### Files that do NOT change
 
@@ -266,7 +266,7 @@ fetch hits CORS issues on a given CDN.
 - [ ] If `expiresAt` is set and the user has the picker open longer than the TTL,
       silently re-fetch metadata before kicking off the download.
 - [ ] Add a single-line console log per download: `path=direct|proxy
-      bytes=… ms=…` — useful for tuning, never user-visible.
+    bytes=… ms=…` — useful for tuning, never user-visible.
 
 ### Phase 5 — Tests and cleanup (1 hr)
 
@@ -297,9 +297,9 @@ fetch hits CORS issues on a given CDN.
 
 ## Deployment implications
 
-This refactor by itself does not change *where* we can deploy — yt-dlp + ffmpeg +
-long-running process is still required for the proxy path. But it does change *how
-much it costs*:
+This refactor by itself does not change _where_ we can deploy — yt-dlp + ffmpeg +
+long-running process is still required for the proxy path. But it does change _how
+much it costs_:
 
 - $4-5/mo Hetzner CX22 was already plenty for the personal-traffic case.
 - After this refactor, the same box comfortably handles a 10-100x traffic bump

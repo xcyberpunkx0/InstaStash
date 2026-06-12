@@ -145,7 +145,7 @@ export default function LibraryPage() {
       <main className="overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 md:px-9 md:py-7 pb-16 relative">
         {/* Decorative spiral doodle */}
         <DoodleSpiral
-          className="absolute top-[30px] right-[110px] w-[70px] pointer-events-none hidden md:block text-[var(--color-terra-500)]"
+          className="absolute top-[30px] right-[110px] w-[70px] pointer-events-none hidden md:block text-terra-500"
           decorOpacity={0.7}
         />
 
@@ -156,7 +156,7 @@ export default function LibraryPage() {
             type="button"
             onClick={() => setMobileNavOpen(true)}
             aria-label="Open menu"
-            className="lg:hidden inline-flex w-10 h-10 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-line-medium)] text-[var(--color-ink-700)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] shrink-0 mt-1"
+            className="lg:hidden inline-flex w-10 h-10 items-center justify-center rounded-full bg-(--color-bg-surface) border border-line-medium text-(--color-ink-700) hover:bg-(--color-paper-200) transition-colors duration-[160ms] shrink-0 mt-1"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <line x1="4" x2="20" y1="6" y2="6"/>
@@ -168,13 +168,13 @@ export default function LibraryPage() {
           <div className="min-w-0 flex-1">
             <h1
               style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
-              className="text-[28px] sm:text-[36px] leading-[1.05] text-[var(--color-ink-900)] m-0"
+              className="text-[28px] sm:text-[36px] leading-[1.05] text-(--color-ink-900) m-0"
             >
               Your library
             </h1>
             <span
               style={{ fontFamily: 'var(--font-hand)', transform: 'rotate(-1deg)' }}
-              className="text-[16px] sm:text-[20px] text-[var(--color-ink-500)] inline-block"
+              className="text-[16px] sm:text-[20px] text-(--color-ink-500) inline-block"
               suppressHydrationWarning
             >
               {dateLabel ? `${dateLabel} · ` : ''}{totalCount} {totalCount === 1 ? 'thing' : 'things'} saved
@@ -185,9 +185,9 @@ export default function LibraryPage() {
         {/* ─── URL BAR ────────────────────────────────────────────────── */}
         <form
           onSubmit={(e) => { e.preventDefault(); handleSubmitUrl(); }}
-          className="flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 pl-4 sm:pl-5 pr-1.5 sm:pr-2 bg-[var(--color-bg-surface)] rounded-[var(--radius-pill)] border border-[var(--color-line-medium)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_36px_-18px_rgba(31,27,22,0.22)] mb-6 sm:mb-8"
+          className="flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 pl-4 sm:pl-5 pr-1.5 sm:pr-2 bg-(--color-bg-surface) rounded-pill border border-line-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_36px_-18px_rgba(31,27,22,0.22)] mb-6 sm:mb-8"
         >
-          <svg className="w-[18px] h-[18px] text-[var(--color-ink-300)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg className="w-[18px] h-[18px] text-(--color-ink-300) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/>
           </svg>
           <input
@@ -196,7 +196,7 @@ export default function LibraryPage() {
             onChange={(e) => setUrlInput(e.target.value)}
             placeholder="paste a link..."
             style={{ fontFamily: 'var(--font-mono)' }}
-            className="flex-1 min-w-0 border-0 outline-none bg-transparent text-[14px] text-[var(--color-ink-900)] py-2 sm:py-2.5 placeholder:text-[var(--color-ink-300)] placeholder:italic placeholder:font-[family-name:var(--font-display)] placeholder:text-[15px] sm:placeholder:text-[16px]"
+            className="flex-1 min-w-0 border-0 outline-none bg-transparent text-small text-(--color-ink-900) py-2 sm:py-2.5 placeholder:text-(--color-ink-300) placeholder:italic placeholder:font-display placeholder:text-[15px] sm:placeholder:text-[16px]"
           />
           {/* Paste — icon-only on mobile, label on desktop */}
           <button
@@ -205,7 +205,7 @@ export default function LibraryPage() {
             aria-label="Paste from clipboard"
             title="Paste"
             style={{ fontFamily: 'var(--font-grotesk)' }}
-            className="inline-flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-3.5 sm:py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] font-medium text-[12px] cursor-pointer hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] shrink-0"
+            className="inline-flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-3.5 sm:py-2 rounded-pill bg-transparent border border-line-medium text-(--color-ink-700) font-medium text-micro cursor-pointer hover:bg-(--color-paper-200) transition-colors duration-[160ms] shrink-0"
           >
             <svg className="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
             <span className="hidden sm:inline">paste</span>
@@ -215,7 +215,7 @@ export default function LibraryPage() {
             type="submit"
             aria-label="Download"
             style={{ fontFamily: 'var(--font-grotesk)' }}
-            className="inline-flex items-center justify-center sm:gap-2 w-9 h-9 sm:w-auto sm:h-auto sm:px-[18px] sm:py-2.5 rounded-[var(--radius-pill)] bg-[var(--color-ink-900)] text-[var(--color-paper-50)] font-semibold text-[13px] cursor-pointer border-0 hover:translate-y-[-1px] transition-transform duration-[160ms] shrink-0"
+            className="inline-flex items-center justify-center sm:gap-2 w-9 h-9 sm:w-auto sm:h-auto sm:px-[18px] sm:py-2.5 rounded-pill bg-(--color-ink-900) text-(--color-paper-50) font-semibold text-[13px] cursor-pointer border-0 hover:translate-y-[-1px] transition-transform duration-[160ms] shrink-0"
           >
             <span className="hidden sm:inline">Download</span>
             <svg className="w-4 h-4 sm:w-[13px] sm:h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
@@ -228,20 +228,20 @@ export default function LibraryPage() {
             <div className="flex items-baseline gap-3 min-w-0">
               <h2
                 style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
-                className="text-[20px] sm:text-[22px] leading-[1.1] text-[var(--color-ink-900)] m-0 truncate"
+                className="text-[20px] sm:text-h3 leading-[1.1] text-(--color-ink-900) m-0 truncate"
               >
                 {sectionTitle}
               </h2>
               <span
                 style={{ fontFamily: 'var(--font-mono)' }}
-                className="text-[12px] text-[var(--color-ink-400)] shrink-0"
+                className="text-micro text-(--color-ink-400) shrink-0"
               >
                 {visible.length === filtered.length ? `${visible.length} total` : `${visible.length} of ${filtered.length}`}
               </span>
             </div>
             <div className="sm:ml-auto flex items-center gap-2">
               <div className="relative w-full sm:w-auto">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--color-ink-300)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-(--color-ink-300)" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                 </svg>
                 <input
@@ -251,7 +251,7 @@ export default function LibraryPage() {
                   placeholder="search..."
                   aria-label="Search library"
                   style={{ fontFamily: 'var(--font-sans)' }}
-                  className="w-full sm:w-[200px] pl-9 pr-3.5 py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] text-[13px] outline-none focus:border-[var(--color-terra-500)] transition-colors duration-[160ms]"
+                  className="w-full sm:w-[200px] pl-9 pr-3.5 py-2 rounded-pill bg-transparent border border-line-medium text-(--color-ink-700) text-[13px] outline-none focus:border-terra-500 transition-colors duration-[160ms]"
                 />
               </div>
               <button
@@ -260,7 +260,7 @@ export default function LibraryPage() {
                 aria-label="Clear all videos from library"
                 title="Clear all"
                 style={{ fontFamily: 'var(--font-grotesk)' }}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-pill)] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-rouge-500)] font-medium text-[12px] cursor-pointer hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-pill bg-transparent border border-line-medium text-rouge-500 font-medium text-micro cursor-pointer hover:bg-(--color-paper-200) transition-colors duration-[160ms] shrink-0"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -310,7 +310,7 @@ export default function LibraryPage() {
             role="status"
             aria-live="polite"
             style={{ fontFamily: 'var(--font-hand)' }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-5 py-2.5 rounded-[var(--radius-pill)] bg-[var(--color-ink-900)] text-[var(--color-paper-50)] text-[18px] shadow-[0_14px_36px_-12px_rgba(31,27,22,0.45)]"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-5 py-2.5 rounded-pill bg-(--color-ink-900) text-(--color-paper-50) text-[18px] shadow-[0_14px_36px_-12px_rgba(31,27,22,0.45)]"
           >
             {toast}
           </div>
@@ -326,29 +326,29 @@ function EmptyLibrary() {
   return (
     <div className="flex flex-col items-center justify-center text-center py-20 max-w-[480px] mx-auto">
       <DoodleCircles
-        className="h-[60px] mb-6 text-[var(--color-ink-500)]"
+        className="h-[60px] mb-6 text-(--color-ink-500)"
         decorOpacity={0.5}
       />
       <h2
         style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
-        className="text-[36px] leading-[1.1] text-[var(--color-ink-900)] m-0 text-balance"
+        className="text-[36px] leading-[1.1] text-(--color-ink-900) m-0 text-balance"
       >
         Nothing tucked away yet.
       </h2>
       <p
         style={{ fontFamily: 'var(--font-hand)' }}
-        className="text-[24px] text-[var(--color-terra-600)] mt-2"
+        className="text-[24px] text-terra-600 mt-2"
       >
         save your first video — it&rsquo;ll land here ✦
       </p>
-      <p className="text-[var(--color-ink-500)] text-[15px] leading-[1.6] mt-4 max-w-[40ch]">
+      <p className="text-(--color-ink-500) text-[15px] leading-[1.6] mt-4 max-w-[40ch]">
         Drop a YouTube, Instagram, or TikTok link on the home page. Anything you save shows up
         here, quiet and searchable.
       </p>
       <a
         href="/"
         style={{ fontFamily: 'var(--font-grotesk)' }}
-        className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-[var(--radius-pill)] bg-[var(--color-ink-900)] text-[var(--color-paper-50)] font-semibold text-[13px] no-underline shadow-[0_8px_20px_-10px_rgba(31,27,22,0.45)] hover:translate-y-[-1px] hover:shadow-[0_14px_26px_-10px_rgba(31,27,22,0.5)] transition-[transform,box-shadow] duration-[160ms]"
+        className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-pill bg-(--color-ink-900) text-(--color-paper-50) font-semibold text-[13px] no-underline shadow-[0_8px_20px_-10px_rgba(31,27,22,0.45)] hover:translate-y-[-1px] hover:shadow-[0_14px_26px_-10px_rgba(31,27,22,0.5)] transition-[transform,box-shadow] duration-[160ms]"
       >
         Save a video
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -367,7 +367,7 @@ function FilterEmpty({ filter, search }: { filter: LibraryFilter; search: string
         : `no ${filter.kind} yet`;
   return (
     <div className="text-center py-16">
-      <p style={{ fontFamily: 'var(--font-hand)' }} className="text-[28px] text-[var(--color-ink-400)]">
+      <p style={{ fontFamily: 'var(--font-hand)' }} className="text-[28px] text-(--color-ink-400)">
         {message}
       </p>
     </div>
@@ -398,12 +398,12 @@ function LibraryCard({
       role="button"
       aria-label={`Open details for ${item.title}`}
       className="
-        relative bg-[var(--color-bg-surface)] bg-blend-multiply
-        rounded-[16px] border border-[var(--color-line-soft)]
-        shadow-[var(--shadow-card)] overflow-hidden cursor-pointer
-        transition-[transform,box-shadow] duration-[240ms] ease-[var(--ease-paper)]
-        hover:translate-y-[-3px] hover:shadow-[var(--shadow-lift)]
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terra-500)]
+        relative bg-(--color-bg-surface) bg-blend-multiply
+        rounded-[16px] border border-line-soft
+        shadow-(--shadow-card) overflow-hidden cursor-pointer
+        transition-[transform,box-shadow] duration-[240ms] ease-(--ease-paper)
+        hover:translate-y-[-3px] hover:shadow-(--shadow-lift)
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-terra-500
       "
     >
       <div
@@ -416,7 +416,7 @@ function LibraryCard({
         {item.duration && (
           <div
             style={{ fontFamily: 'var(--font-mono)' }}
-            className="absolute right-2 bottom-2 px-2 py-0.5 rounded-[var(--radius-pill)] bg-[rgba(31,27,22,0.65)] backdrop-blur-[6px] text-[var(--color-paper-50)] text-[10px] z-[2]"
+            className="absolute right-2 bottom-2 px-2 py-0.5 rounded-pill bg-[rgba(31,27,22,0.65)] backdrop-blur-[6px] text-(--color-paper-50) text-[10px] z-[2]"
           >
             {formatDuration(item.duration)}
           </div>
@@ -426,23 +426,23 @@ function LibraryCard({
       <div className="p-3.5 pb-4">
         <div
           style={{ fontFamily: 'var(--font-grotesk)' }}
-          className="font-semibold text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-400)]"
+          className="font-semibold text-[10px] uppercase tracking-[0.14em] text-(--color-ink-400)"
         >
           {platformLabel}
         </div>
         <div
           style={{ fontFamily: 'var(--font-display)' }}
-          className="font-medium text-[17px] leading-[1.15] text-[var(--color-ink-900)] mt-1 mb-1.5 line-clamp-2"
+          className="font-medium text-[17px] leading-[1.15] text-(--color-ink-900) mt-1 mb-1.5 line-clamp-2"
         >
           {item.title}
         </div>
         <div
           style={{ fontFamily: 'var(--font-mono)' }}
-          className="flex gap-1.5 items-center flex-wrap text-[11px] text-[var(--color-ink-400)]"
+          className="flex gap-1.5 items-center flex-wrap text-[11px] text-(--color-ink-400)"
         >
           <span
             style={{ fontFamily: 'var(--font-sans)' }}
-            className="px-2 py-0.5 rounded-[var(--radius-pill)] bg-[var(--color-paper-200)] text-[var(--color-ink-700)] text-[11px]"
+            className="px-2 py-0.5 rounded-pill bg-(--color-paper-200) text-(--color-ink-700) text-[11px]"
           >
             {fileLabel}
           </span>
@@ -459,7 +459,7 @@ function LibraryCard({
               <span
                 key={c.id}
                 style={{ fontFamily: 'var(--font-sans)' }}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--radius-pill)] bg-[var(--color-paper-200)] text-[var(--color-ink-700)] text-[11px]"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill bg-(--color-paper-200) text-(--color-ink-700) text-[11px]"
               >
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: c.color }} aria-hidden="true" />
                 {c.name}
@@ -544,7 +544,7 @@ function DetailPanel({
           <button
             onClick={onClose}
             aria-label="Close detail panel"
-            className="absolute right-3.5 top-3.5 w-[30px] h-[30px] rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-line-medium)] cursor-pointer inline-flex items-center justify-center text-[var(--color-ink-700)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms] z-[5]"
+            className="absolute right-3.5 top-3.5 w-[30px] h-[30px] rounded-full bg-(--color-bg-surface) border border-line-medium cursor-pointer inline-flex items-center justify-center text-(--color-ink-700) hover:bg-(--color-paper-200) transition-colors duration-[160ms] z-[5]"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
@@ -560,7 +560,7 @@ function DetailPanel({
           {item.duration && (
             <div
               style={{ fontFamily: 'var(--font-mono)' }}
-              className="absolute right-2 bottom-2 px-2 py-0.5 rounded-[var(--radius-pill)] bg-[rgba(31,27,22,0.65)] backdrop-blur-[6px] text-[var(--color-paper-50)] text-[10px]"
+              className="absolute right-2 bottom-2 px-2 py-0.5 rounded-pill bg-[rgba(31,27,22,0.65)] backdrop-blur-[6px] text-(--color-paper-50) text-[10px]"
             >
               {formatDuration(item.duration)}
             </div>
@@ -571,19 +571,19 @@ function DetailPanel({
         <div>
           <div
             style={{ fontFamily: 'var(--font-grotesk)' }}
-            className="font-semibold text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-400)]"
+            className="font-semibold text-[10px] uppercase tracking-[0.14em] text-(--color-ink-400)"
           >
             {String(item.platform).toLowerCase()}
           </div>
           <h3
             style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 500 }}
-            className="text-[24px] leading-[1.12] text-[var(--color-ink-900)] mt-1 mb-1"
+            className="text-[24px] leading-[1.12] text-(--color-ink-900) mt-1 mb-1"
           >
             {item.title}
           </h3>
           <div
             style={{ fontFamily: 'var(--font-mono)' }}
-            className="text-[11px] text-[var(--color-ink-500)] truncate"
+            className="text-[11px] text-(--color-ink-500) truncate"
             title={item.filename}
           >
             {item.filename}
@@ -626,13 +626,13 @@ function DetailPanel({
             onClick={() => setCollectionsOpen((v) => !v)}
             aria-expanded={collectionsOpen}
             style={{ fontFamily: 'var(--font-grotesk)' }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] bg-transparent border border-[var(--color-line-medium)] text-[var(--color-ink-700)] font-medium text-[12px] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] bg-transparent border border-line-medium text-(--color-ink-700) font-medium text-micro hover:bg-(--color-paper-200) transition-colors duration-[160ms]"
           >
             <span className="inline-flex items-center gap-2">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
               Collections
               {itemCollections.length > 0 && (
-                <span style={{ fontFamily: 'var(--font-mono)' }} className="text-[var(--color-ink-400)] text-[11px]">
+                <span style={{ fontFamily: 'var(--font-mono)' }} className="text-(--color-ink-400) text-[11px]">
                   · {itemCollections.length}
                 </span>
               )}
@@ -647,7 +647,7 @@ function DetailPanel({
                 <span
                   key={c.id}
                   style={{ fontFamily: 'var(--font-sans)' }}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--radius-pill)] bg-[var(--color-paper-200)] text-[var(--color-ink-700)] text-[11px]"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill bg-(--color-paper-200) text-(--color-ink-700) text-[11px]"
                 >
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: c.color }} aria-hidden="true" />
                   {c.name}
@@ -657,9 +657,9 @@ function DetailPanel({
           )}
 
           {collectionsOpen && (
-            <div className="mt-2 p-2 rounded-[12px] bg-[var(--color-bg-recessed)] border border-[var(--color-line-soft)]">
+            <div className="mt-2 p-2 rounded-[12px] bg-(--color-bg-recessed) border border-line-soft">
               {collections.length === 0 && (
-                <p className="px-2 py-1 text-[12px] text-[var(--color-ink-500)] leading-[1.5]">
+                <p className="px-2 py-1 text-micro text-(--color-ink-500) leading-[1.5]">
                   No collections yet. Make one below.
                 </p>
               )}
@@ -668,7 +668,7 @@ function DetailPanel({
                 return (
                   <label
                     key={c.id}
-                    className="flex items-center gap-2.5 px-2 py-1.5 rounded-[8px] cursor-pointer hover:bg-[var(--color-paper-200)] transition-colors duration-[120ms]"
+                    className="flex items-center gap-2.5 px-2 py-1.5 rounded-[8px] cursor-pointer hover:bg-(--color-paper-200) transition-colors duration-[120ms]"
                   >
                     <input
                       type="checkbox"
@@ -677,16 +677,16 @@ function DetailPanel({
                       className="sr-only peer"
                     />
                     <span
-                      className="inline-flex items-center justify-center w-4 h-4 rounded-[5px] border peer-checked:bg-[var(--color-ink-900)] peer-checked:border-[var(--color-ink-900)] transition-colors"
+                      className="inline-flex items-center justify-center w-4 h-4 rounded-[5px] border peer-checked:bg-(--color-ink-900) peer-checked:border-(--color-ink-900) transition-colors"
                       style={{ borderColor: isAssigned ? 'var(--color-ink-900)' : 'var(--color-line-medium)', background: isAssigned ? 'var(--color-ink-900)' : 'transparent' }}
                       aria-hidden="true"
                     >
                       {isAssigned && (
-                        <svg className="w-2.5 h-2.5 text-[var(--color-paper-50)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <svg className="w-2.5 h-2.5 text-(--color-paper-50)" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       )}
                     </span>
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.color }} aria-hidden="true" />
-                    <span className="text-[13px] text-[var(--color-ink-900)]">{c.name}</span>
+                    <span className="text-[13px] text-(--color-ink-900)">{c.name}</span>
                   </label>
                 );
               })}
@@ -702,13 +702,13 @@ function DetailPanel({
                   onChange={(e) => setNewCollection(e.target.value)}
                   placeholder="+ new collection..."
                   aria-label="New collection name"
-                  className="flex-1 px-2 py-1.5 rounded-[8px] bg-transparent border border-[var(--color-line-medium)] text-[12px] text-[var(--color-ink-900)] outline-none focus:border-[var(--color-terra-500)] transition-colors duration-[160ms]"
+                  className="flex-1 px-2 py-1.5 rounded-[8px] bg-transparent border border-line-medium text-micro text-(--color-ink-900) outline-none focus:border-terra-500 transition-colors duration-[160ms]"
                 />
                 <button
                   type="submit"
                   disabled={!newCollection.trim()}
                   aria-label="Create collection"
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[var(--color-ink-900)] text-[var(--color-paper-50)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-opacity duration-[160ms]"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-(--color-ink-900) text-(--color-paper-50) disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-opacity duration-[160ms]"
                 >
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
@@ -718,17 +718,17 @@ function DetailPanel({
         </div>
 
         {/* Meta rows */}
-        <div className="text-[12px]">
+        <div className="text-micro">
           {[
             ['Format', `${item.format ?? '—'}${item.resolution ? ` · ${item.resolution}` : ''}`],
             ['Size', formatFileSize(item.fileSize)],
             ['Saved', formatRelativeTime(item.savedAt)],
             ['Source', sourceShort],
           ].map(([label, value]) => (
-            <div key={label} className="flex justify-between items-center text-[var(--color-ink-700)] py-1.5 border-b border-dashed border-[var(--color-line-medium)] gap-3 last:border-b-0">
+            <div key={label} className="flex justify-between items-center text-(--color-ink-700) py-1.5 border-b border-dashed border-line-medium gap-3 last:border-b-0">
               <span
                 style={{ fontFamily: 'var(--font-grotesk)' }}
-                className="text-[var(--color-ink-400)] text-[10px] uppercase tracking-[0.12em] font-semibold shrink-0"
+                className="text-(--color-ink-400) text-[10px] uppercase tracking-[0.12em] font-semibold shrink-0"
               >
                 {label}
               </span>
@@ -764,10 +764,10 @@ function IconAction({
   danger?: boolean;
 }) {
   const styles = primary
-    ? 'bg-[var(--color-ink-900)] text-[var(--color-paper-50)] hover:bg-[var(--color-ink-700)]'
+    ? 'bg-(--color-ink-900) text-(--color-paper-50) hover:bg-(--color-ink-700)'
     : danger
-      ? 'bg-transparent text-[var(--color-rouge-500)] border border-[var(--color-line-medium)] hover:bg-[var(--color-paper-200)]'
-      : 'bg-transparent text-[var(--color-ink-700)] border border-[var(--color-line-medium)] hover:bg-[var(--color-paper-200)]';
+      ? 'bg-transparent text-rouge-500 border border-line-medium hover:bg-(--color-paper-200)'
+      : 'bg-transparent text-(--color-ink-700) border border-line-medium hover:bg-(--color-paper-200)';
 
   const className = `inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer transition-colors duration-[160ms] ${styles}`;
   const inner = (

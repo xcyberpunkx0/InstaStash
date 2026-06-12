@@ -16,8 +16,8 @@ export interface StickyNoteProps {
 export function StickyNote({ children, color = 'yellow', rotate = -3, className = '' }: StickyNoteProps) {
   const colors = {
     yellow: 'bg-[#F5E6BD]',
-    sage: 'bg-[var(--color-sage-200)]',
-    terra: 'bg-[var(--color-terra-200)]',
+    sage: 'bg-sage-200',
+    terra: 'bg-terra-200',
   };
 
   return (

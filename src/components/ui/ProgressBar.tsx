@@ -19,8 +19,8 @@ export function ProgressBar({ value, variant = 'terra', label }: ProgressBarProp
   const clamped = Math.min(100, Math.max(0, Math.round(value)));
 
   const fillGradient = variant === 'terra'
-    ? 'bg-gradient-to-r from-[var(--color-terra-500)] to-[var(--color-terra-600)]'
-    : 'bg-[var(--color-sage-500)]';
+    ? 'bg-gradient-to-r from-terra-500 to-terra-600'
+    : 'bg-sage-500';
 
   return (
     <div

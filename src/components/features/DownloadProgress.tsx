@@ -44,7 +44,7 @@ export function DownloadProgressView({ percentage, totalSize }: DownloadProgress
         aria-label={`Download progress: ${clamped}%`}
       >
         <div
-          className="absolute left-0 top-0 bottom-0 rounded-pill bg-linear-to-r from-terra-500 to-(--color-terra-600) shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition-[width] duration-[240ms] ease-[var(--ease-paper)]"
+          className="absolute left-0 top-0 bottom-0 rounded-pill bg-linear-to-r from-terra-500 to-(--color-terra-600) shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition-[width] duration-[240ms] ease-(--ease-paper)"
           style={{ width: `${clamped}%` }}
         />
       </div>

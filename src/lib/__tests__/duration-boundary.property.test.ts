@@ -12,6 +12,11 @@ import { VideoFetcher, VideoFetchError, MAX_DURATION_SECONDS } from '../video-fe
  * **Validates: Requirements 3.7**
  */
 
+// Mock scrapeInstagramVideo to fail instantly to avoid real network calls and race conditions
+vi.mock('../instagram-scraper', () => ({
+  scrapeInstagramVideo: vi.fn().mockRejectedValue(new Error('Scrape failed')),
+}));
+
 // Mock youtube-dl-exec
 vi.mock('youtube-dl-exec', () => ({
   default: vi.fn(),
@@ -24,10 +29,10 @@ function mockYtDlpWithDuration(duration: number): void {
   mockYtDlp.mockResolvedValue({
     title: 'Test Video',
     duration,
-    thumbnail: 'https://img.youtube.com/thumb.jpg',
+    thumbnail: 'https://img.instagram.com/thumb.jpg',
     formats: [
       {
-        format_id: '22',
+        format_id: '1',
         ext: 'mp4',
         height: 720,
         width: 1280,
@@ -53,8 +58,8 @@ describe('Feature: video-downloader-site, Property 5: Duration Boundary Enforcem
         mockYtDlpWithDuration(duration);
 
         const result = await fetcher.fetchMetadata(
-          'https://www.youtube.com/watch?v=test123',
-          'youtube'
+          'https://www.instagram.com/reel/test123',
+          'instagram'
         );
 
         expect(result.duration).toBe(duration);
@@ -71,8 +76,8 @@ describe('Feature: video-downloader-site, Property 5: Duration Boundary Enforcem
 
         try {
           await fetcher.fetchMetadata(
-            'https://www.youtube.com/watch?v=test123',
-            'youtube'
+            'https://www.instagram.com/reel/test123',
+            'instagram'
           );
           // Should not reach here
           expect.fail('Expected VideoFetchError to be thrown');
@@ -89,8 +94,8 @@ describe('Feature: video-downloader-site, Property 5: Duration Boundary Enforcem
     // Exact boundary: 3600 should be accepted
     mockYtDlpWithDuration(3600);
     const accepted = await fetcher.fetchMetadata(
-      'https://www.youtube.com/watch?v=boundary',
-      'youtube'
+      'https://www.instagram.com/reel/boundary',
+      'instagram'
     );
     expect(accepted.duration).toBe(3600);
 
@@ -98,8 +103,8 @@ describe('Feature: video-downloader-site, Property 5: Duration Boundary Enforcem
     mockYtDlpWithDuration(3601);
     try {
       await fetcher.fetchMetadata(
-        'https://www.youtube.com/watch?v=boundary',
-        'youtube'
+        'https://www.instagram.com/reel/boundary',
+        'instagram'
       );
       expect.fail('Expected VideoFetchError to be thrown for duration 3601');
     } catch (e) {
@@ -115,15 +120,15 @@ describe('Feature: video-downloader-site, Property 5: Duration Boundary Enforcem
 
         if (duration <= MAX_DURATION_SECONDS) {
           const result = await fetcher.fetchMetadata(
-            'https://www.youtube.com/watch?v=test123',
-            'youtube'
+            'https://www.instagram.com/reel/test123',
+            'instagram'
           );
           expect(result.duration).toBe(duration);
         } else {
           try {
             await fetcher.fetchMetadata(
-              'https://www.youtube.com/watch?v=test123',
-              'youtube'
+              'https://www.instagram.com/reel/test123',
+              'instagram'
             );
             expect.fail(`Expected VideoFetchError for duration ${duration}`);
           } catch (e) {

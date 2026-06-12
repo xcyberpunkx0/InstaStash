@@ -31,11 +31,11 @@ export function LibraryGrid({ onItemClick }: { onItemClick?: () => void } = {}) 
           key={i}
           onClick={onItemClick}
           className="
-            relative bg-[var(--color-bg-surface)] bg-blend-multiply
-            rounded-[16px] border border-[var(--color-line-soft)]
-            shadow-[var(--shadow-card)] overflow-hidden cursor-pointer
-            transition-[transform,box-shadow] duration-[240ms] ease-[var(--ease-paper)]
-            hover:translate-y-[-3px] hover:shadow-[var(--shadow-lift)]
+            relative bg-(--color-bg-surface) bg-blend-multiply
+            rounded-[16px] border border-line-soft
+            shadow-(--shadow-card) overflow-hidden cursor-pointer
+            transition-[transform,box-shadow] duration-[240ms] ease-(--ease-paper)
+            hover:translate-y-[-3px] hover:shadow-(--shadow-lift)
           "
         >
           {/* Thumbnail */}
@@ -45,12 +45,12 @@ export function LibraryGrid({ onItemClick }: { onItemClick?: () => void } = {}) 
               <svg width="12" height="14" viewBox="0 0 12 14"><path d="M1 1 L 1 13 L 11 7 Z" fill="#1F1B16"/></svg>
             </div>
             {/* Duration badge */}
-            <div className="absolute right-2 bottom-2 px-2 py-0.5 rounded-[var(--radius-pill)] bg-[rgba(31,27,22,0.65)] backdrop-blur-[6px] text-[var(--color-paper-50)] font-[family-name:var(--font-mono)] text-[10px] z-[2]">
+            <div className="absolute right-2 bottom-2 px-2 py-0.5 rounded-pill bg-[rgba(31,27,22,0.65)] backdrop-blur-[6px] text-(--color-paper-50) font-mono text-[10px] z-[2]">
               {item.duration}
             </div>
             {/* Note */}
             {item.note && (
-              <span className="absolute top-2.5 right-2.5 font-[family-name:var(--font-hand)] text-[18px] text-[var(--color-paper-50)] z-[2] drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]" style={{ transform: 'rotate(-3deg)' }}>
+              <span className="absolute top-2.5 right-2.5 font-hand text-[18px] text-(--color-paper-50) z-[2] drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]" style={{ transform: 'rotate(-3deg)' }}>
                 {item.note}
               </span>
             )}
@@ -58,14 +58,14 @@ export function LibraryGrid({ onItemClick }: { onItemClick?: () => void } = {}) 
 
           {/* Body */}
           <div className="p-3.5 pb-4">
-            <div className="font-[family-name:var(--font-grotesk)] font-semibold text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-400)]">
+            <div className="font-grotesk font-semibold text-[10px] uppercase tracking-[0.14em] text-(--color-ink-400)">
               {item.platform}
             </div>
-            <div className="font-[family-name:var(--font-display)] font-medium text-[17px] leading-[1.15] text-[var(--color-ink-900)] mt-1 mb-1.5 line-clamp-2">
+            <div className="font-display font-medium text-[17px] leading-[1.15] text-(--color-ink-900) mt-1 mb-1.5 line-clamp-2">
               {item.title}
             </div>
-            <div className="flex gap-1.5 items-center flex-wrap font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-ink-400)]">
-              <span className="px-2 py-0.5 rounded-[var(--radius-pill)] bg-[var(--color-paper-200)] text-[var(--color-ink-700)] font-[family-name:var(--font-sans)] text-[11px]">
+            <div className="flex gap-1.5 items-center flex-wrap font-mono text-[11px] text-(--color-ink-400)">
+              <span className="px-2 py-0.5 rounded-pill bg-(--color-paper-200) text-(--color-ink-700) font-sans text-[11px]">
                 {item.tag}
               </span>
               <span>·</span>

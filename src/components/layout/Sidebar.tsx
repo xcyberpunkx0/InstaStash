@@ -38,11 +38,11 @@ function NavItem({ icon, label, count, active, dot, onClick, onDelete }: NavItem
   return (
     <div
       className={`group relative flex items-center gap-3 px-3 py-[9px] rounded-[12px]
-        text-[14px] font-[family-name:var(--font-sans)] cursor-pointer select-none
+        text-small font-sans cursor-pointer select-none
         transition-[background,color] duration-[160ms]
         ${active
-          ? 'bg-[var(--color-ink-900)] text-[var(--color-paper-50)] shadow-[0_4px_10px_-4px_rgba(31,27,22,0.35)]'
-          : 'text-[var(--color-ink-700)] hover:bg-[var(--color-paper-200)]'
+          ? 'bg-(--color-ink-900) text-(--color-paper-50) shadow-[0_4px_10px_-4px_rgba(31,27,22,0.35)]'
+          : 'text-(--color-ink-700) hover:bg-(--color-paper-200)'
         }
       `}
       onClick={onClick}
@@ -58,8 +58,8 @@ function NavItem({ icon, label, count, active, dot, onClick, onDelete }: NavItem
       <span className="truncate">{label}</span>
       {count !== undefined && (
         <span
-          className={`ml-auto font-[family-name:var(--font-mono)] text-[11px] ${
-            active ? 'text-[var(--color-paper-300)]' : 'text-[var(--color-ink-400)]'
+          className={`ml-auto font-mono text-[11px] ${
+            active ? 'text-(--color-paper-300)' : 'text-(--color-ink-400)'
           } ${onDelete ? 'group-hover:hidden' : ''}`}
         >
           {count}
@@ -71,7 +71,7 @@ function NavItem({ icon, label, count, active, dot, onClick, onDelete }: NavItem
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
           aria-label={`Delete collection "${label}"`}
           className={`ml-auto hidden group-hover:inline-flex w-5 h-5 items-center justify-center rounded-full ${
-            active ? 'text-[var(--color-paper-300)] hover:text-[var(--color-paper-50)]' : 'text-[var(--color-ink-400)] hover:text-[var(--color-rouge-500)]'
+            active ? 'text-(--color-paper-300) hover:text-(--color-paper-50)' : 'text-(--color-ink-400) hover:text-rouge-500'
           } transition-colors duration-[120ms]`}
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -83,7 +83,7 @@ function NavItem({ icon, label, count, active, dot, onClick, onDelete }: NavItem
 
 function SectionLabel({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between font-[family-name:var(--font-grotesk)] font-semibold text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink-400)] px-3 pt-4 pb-2">
+    <div className="flex items-center justify-between font-grotesk font-semibold text-[10px] uppercase tracking-[0.18em] text-(--color-ink-400) px-3 pt-4 pb-2">
       <span>{children}</span>
       {action}
     </div>
@@ -212,7 +212,7 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
 
       {/* Brand + theme picker + close (mobile only) */}
       <div className="flex items-center justify-between gap-2 px-2 pt-1.5 pb-[18px]">
-        <a href="/" className="flex items-center gap-2.5 text-[var(--color-ink-900)]" aria-label="AuraVault home">
+        <a href="/" className="flex items-center gap-2.5 text-(--color-ink-900)" aria-label="AuraVault home">
           <Logo className="h-[30px]" />
         </a>
         <div className="flex items-center gap-1">
@@ -222,7 +222,7 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
             type="button"
             onClick={onMobileClose}
             aria-label="Close menu"
-            className="lg:hidden inline-flex w-9 h-9 items-center justify-center rounded-full text-[var(--color-ink-700)] hover:bg-[var(--color-paper-200)] transition-colors duration-[160ms]"
+            className="lg:hidden inline-flex w-9 h-9 items-center justify-center rounded-full text-(--color-ink-700) hover:bg-(--color-paper-200) transition-colors duration-[160ms]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
@@ -267,7 +267,7 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
             type="button"
             onClick={() => setCreatingNew(true)}
             aria-label="New collection"
-            className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[var(--color-ink-400)] hover:text-[var(--color-ink-900)] hover:bg-[var(--color-paper-200)] transition-colors duration-[120ms]"
+            className="inline-flex items-center justify-center w-5 h-5 rounded-full text-(--color-ink-400) hover:text-(--color-ink-900) hover:bg-(--color-paper-200) transition-colors duration-[120ms]"
           >
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           </button>
@@ -277,7 +277,7 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
       </SectionLabel>
 
       {collections.length === 0 && !creatingNew && (
-        <p className="px-3 pb-1 text-[12px] text-[var(--color-ink-400)] leading-[1.45]">
+        <p className="px-3 pb-1 text-micro text-(--color-ink-400) leading-[1.45]">
           No collections yet. Tap <span className="inline-block align-middle"><svg className="inline w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span> to make one.
         </p>
       )}
@@ -308,21 +308,21 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
             onKeyDown={(e) => { if (e.key === 'Escape') { setNewName(''); setCreatingNew(false); } }}
             placeholder="collection name..."
             aria-label="New collection name"
-            className="w-full px-2 py-1.5 rounded-[10px] bg-[var(--color-bg-surface)] border border-[var(--color-line-medium)] text-[13px] text-[var(--color-ink-900)] outline-none focus:border-[var(--color-terra-500)] transition-colors duration-[160ms]"
+            className="w-full px-2 py-1.5 rounded-[10px] bg-(--color-bg-surface) border border-line-medium text-[13px] text-(--color-ink-900) outline-none focus:border-terra-500 transition-colors duration-[160ms]"
           />
         </form>
       )}
 
       {/* Pinned tip */}
-      <div className="mt-auto p-3.5 bg-[var(--color-paper-200)] rounded-[14px] relative">
+      <div className="mt-auto p-3.5 bg-(--color-paper-200) rounded-[14px] relative">
         <div
           className="absolute -top-2.5 left-[18px] w-[60px] h-[18px] bg-[rgba(201,184,158,0.55)] border border-[rgba(31,27,22,0.08)] shadow-[0_4px_8px_-4px_rgba(31,27,22,0.3)]"
           style={{ transform: 'rotate(-5deg)' }}
         />
-        <div className="font-[family-name:var(--font-hand)] text-[20px] text-[var(--color-ink-700)] leading-tight mb-1">
+        <div className="font-hand text-[20px] text-(--color-ink-700) leading-tight mb-1">
           saved here, just here —
         </div>
-        <div className="text-[var(--color-ink-500)] text-[12px] leading-[1.45]">
+        <div className="text-(--color-ink-500) text-micro leading-[1.45]">
           your library lives in this browser. clear site data and it&rsquo;s gone. the videos themselves stay in your downloads folder.
         </div>
       </div>
@@ -334,8 +334,8 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
       {/* Desktop sidebar — always visible from lg up */}
       <aside className="
         hidden lg:flex
-        bg-[var(--color-bg-glass)] backdrop-blur-[14px] backdrop-saturate-[1.04]
-        border-r border-[var(--color-line-soft)]
+        bg-(--color-bg-glass) backdrop-blur-[14px] backdrop-saturate-[1.04]
+        border-r border-line-soft
         p-[22px_18px] flex-col gap-2
         relative
         overflow-y-auto
@@ -370,8 +370,8 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
               className="
                 fixed left-0 top-0 bottom-0 z-50
                 w-[300px] max-w-[88vw]
-                bg-[var(--color-bg-canvas)]
-                border-r border-[var(--color-line-soft)]
+                bg-(--color-bg-canvas)
+                border-r border-line-soft
                 shadow-[0_28px_80px_-24px_rgba(31,27,22,0.55)]
                 p-[18px_14px] flex flex-col gap-2
                 overflow-y-auto outline-none

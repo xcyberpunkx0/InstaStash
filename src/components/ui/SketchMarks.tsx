@@ -6,8 +6,8 @@ import React from 'react';
  * Themeable inline SVG sketch marks.
  *
  * Every stroke uses `currentColor`, so they automatically pick up the
- * surrounding text color (e.g. `text-[var(--color-terra-500)]`,
- * `text-[var(--color-ink-700)]`, etc.). This way the marks adapt to any
+ * surrounding text color (e.g. `text-terra-500`,
+ * `text-(--color-ink-700)`, etc.). This way the marks adapt to any
  * theme — including dark themes — without us having to ship per-theme
  * SVG files.
  */

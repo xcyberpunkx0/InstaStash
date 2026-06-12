@@ -58,36 +58,8 @@ describe('Feature: video-downloader-site, Property 3: Invalid URL Rejection', ()
     );
   });
 
-  it('rejects supported domain with bad paths (YouTube)', () => {
-    // Generate random path segments that don't match /watch?v=, /shorts/, or valid patterns
-    const alphanumChars = 'abcdefghijklmnopqrstuvwxyz0123456789'.split('');
-    const badYoutubePathArb = fc
-      .array(fc.constantFrom(...alphanumChars), { minLength: 1, maxLength: 20 })
-      .map((chars) => chars.join(''))
-      .filter((path) => {
-        const lower = path.toLowerCase();
-        return lower !== 'watch' && lower !== 'shorts';
-      });
-
-    fc.assert(
-      fc.property(
-        fc.record({
-          prefix: fc.constantFrom('www.', 'm.', ''),
-          path: badYoutubePathArb,
-        }),
-        ({ prefix, path }) => {
-          const url = `https://${prefix}youtube.com/${path}`;
-          const result = detector.detect(url);
-          expect(isDetectError(result)).toBe(true);
-          expect(isDetectSuccess(result)).toBe(false);
-        }
-      ),
-      { numRuns: 100 }
-    );
-  });
-
   it('rejects unsupported domains', () => {
-    // Generate random domain names that are NOT instagram.com, youtube.com, or youtu.be
+    // Generate random domain names that are NOT instagram.com
     const alphanumChars = 'abcdefghijklmnopqrstuvwxyz0123456789'.split('');
     const unsupportedDomainArb = fc
       .tuple(
@@ -99,10 +71,7 @@ describe('Feature: video-downloader-site, Property 3: Invalid URL Rejection', ()
         const lower = domain.toLowerCase();
         return (
           lower !== 'instagram.com' &&
-          lower !== 'youtube.com' &&
-          lower !== 'youtu.be' &&
-          !lower.endsWith('.instagram.com') &&
-          !lower.endsWith('.youtube.com')
+          !lower.endsWith('.instagram.com')
         );
       });
 

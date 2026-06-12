@@ -63,12 +63,12 @@ export function ErrorMessage({
     <div className="flex flex-col items-center gap-4 py-6 text-center">
       <SketchCharacter mood={mood} />
 
-      <p role="alert" className="text-[15px] text-[var(--color-rouge-500)] max-w-[400px]">
+      <p role="alert" className="text-[15px] text-rouge-500 max-w-[400px]">
         {displayMessage}
       </p>
 
       {countdown !== undefined && countdown > 0 && type === 'rate-limit' && (
-        <p className="font-[family-name:var(--font-hand)] text-[20px] text-[var(--color-ink-400)]" aria-live="polite">
+        <p className="font-hand text-[20px] text-(--color-ink-400)" aria-live="polite">
           retry in {countdown}s...
         </p>
       )}

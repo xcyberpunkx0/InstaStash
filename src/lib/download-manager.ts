@@ -106,13 +106,9 @@ export class DownloadManager {
 
     return new ReadableStream<Uint8Array>({
       start: (controller) => {
-        // Format selector strategy: numeric YouTube IDs merge with bestaudio,
-        // anything else falls back to bestvideo*+bestaudio so Instagram/TikTok/etc
-        // always get audio.
-        const isYouTubeNumericFormat = /^\d+$/.test(formatId);
-        const formatSelector = isYouTubeNumericFormat
-          ? `${formatId}+bestaudio/best`
-          : 'bestvideo*+bestaudio/best';
+        // Format selector strategy: Instagram URLs are pre-muxed combined videos,
+        // so we use the format ID requested.
+        const formatSelector = formatId;
 
         const args = [
           '-f', formatSelector,

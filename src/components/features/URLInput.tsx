@@ -64,9 +64,9 @@ export function URLInput({ onSubmit, isLoading, error, detectedPlatform }: URLIn
         className="
           flex items-center gap-2
           py-2 pl-6 pr-2
-          bg-[var(--color-bg-surface)]
-          rounded-[var(--radius-pill)]
-          border border-[var(--color-line-medium)]
+          bg-(--color-bg-surface)
+          rounded-pill
+          border border-line-medium
           shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_22px_50px_-22px_rgba(31,27,22,0.30)]
           transition-shadow duration-[240ms]
           focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_30px_60px_-22px_rgba(31,27,22,0.36)]
@@ -74,7 +74,7 @@ export function URLInput({ onSubmit, isLoading, error, detectedPlatform }: URLIn
       >
         {/* Link icon — Lucide link-2, stroke 1.75 */}
         <svg
-          className="w-[18px] h-[18px] text-[var(--color-ink-300)] shrink-0"
+          className="w-[18px] h-[18px] text-(--color-ink-300) shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -97,11 +97,11 @@ export function URLInput({ onSubmit, isLoading, error, detectedPlatform }: URLIn
           placeholder="paste a link, any link..."
           className="
             flex-1 border-0 outline-none bg-transparent min-w-0
-            font-[family-name:var(--font-mono)] text-[16px]
-            text-[var(--color-ink-900)] py-[14px]
-            placeholder:text-[var(--color-ink-300)]
+            font-mono text-[16px]
+            text-(--color-ink-900) py-[14px]
+            placeholder:text-(--color-ink-300)
             placeholder:italic
-            placeholder:font-[family-name:var(--font-display)]
+            placeholder:font-display
             placeholder:text-[18px]
           "
           onPaste={handlePaste}
@@ -116,7 +116,7 @@ export function URLInput({ onSubmit, isLoading, error, detectedPlatform }: URLIn
         {/* Loading spinner */}
         {isLoading && (
           <div
-            className="w-5 h-5 border-2 border-[var(--color-terra-500)] border-t-transparent rounded-full animate-spin shrink-0 mr-2"
+            className="w-5 h-5 border-2 border-terra-500 border-t-transparent rounded-full animate-spin shrink-0 mr-2"
             role="status"
             aria-label="Detecting platform"
           />
@@ -129,14 +129,14 @@ export function URLInput({ onSubmit, isLoading, error, detectedPlatform }: URLIn
           disabled={isLoading}
           className="
             inline-flex items-center gap-2
-            px-6 py-[14px] rounded-[var(--radius-pill)]
-            bg-[var(--color-ink-900)] text-[var(--color-paper-50)]
-            font-[family-name:var(--font-grotesk)] font-semibold text-[15px]
+            px-6 py-[14px] rounded-pill
+            bg-(--color-ink-900) text-(--color-paper-50)
+            font-grotesk font-semibold text-[15px]
             cursor-pointer border-0
             shadow-[0_8px_20px_-10px_rgba(31,27,22,0.45)]
             hover:translate-y-[-1px] hover:shadow-[0_14px_26px_-10px_rgba(31,27,22,0.5)]
             active:translate-y-0
-            transition-[transform,box-shadow] duration-[160ms] ease-[var(--ease-paper)]
+            transition-[transform,box-shadow] duration-[160ms] ease-(--ease-paper)
             disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
             shrink-0
           "
@@ -155,7 +155,7 @@ export function URLInput({ onSubmit, isLoading, error, detectedPlatform }: URLIn
       {error && (
         <p
           id="url-input-error"
-          className="mt-3 text-[14px] font-[family-name:var(--font-sans)] text-[var(--color-rouge-500)] pl-6"
+          className="mt-3 text-small font-sans text-rouge-500 pl-6"
           role="alert"
         >
           {error}

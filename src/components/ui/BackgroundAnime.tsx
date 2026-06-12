@@ -140,7 +140,7 @@ export function BackgroundAnime({ className = '' }: BackgroundAnimeProps) {
               ease: 'easeInOut',
             }}
           >
-            <svg viewBox="0 0 16 16" className="w-full h-full text-[var(--color-terra-500)]">
+            <svg viewBox="0 0 16 16" className="w-full h-full text-terra-500">
               <path
                 d="M8 0 L 9 7 L 16 8 L 9 9 L 8 16 L 7 9 L 0 8 L 7 7 Z"
                 fill="currentColor"

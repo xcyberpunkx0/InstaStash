@@ -1,9 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { VideoFetcher, VideoFetchError, MAX_DURATION_SECONDS } from './video-fetcher';
 
-// Mock youtube-dl-exec
+// Mock youtube-dl-exec and instagram-scraper
 vi.mock('youtube-dl-exec', () => ({
   default: vi.fn(),
+}));
+
+vi.mock('./instagram-scraper', () => ({
+  scrapeInstagramVideo: vi.fn().mockRejectedValue(new Error('Scrape failed')),
 }));
 
 import youtubeDlExec from 'youtube-dl-exec';
@@ -18,31 +22,6 @@ describe('VideoFetcher', () => {
   });
 
   describe('fetchMetadata', () => {
-    it('should return metadata for a YouTube video with multiple formats', async () => {
-      mockYtDlp.mockResolvedValue({
-        title: 'Test Video',
-        duration: 300,
-        thumbnail: 'https://img.youtube.com/thumb.jpg',
-        formats: [
-          { format_id: '18', ext: 'mp4', height: 360, width: 640, filesize: 15000000, vcodec: 'avc1', acodec: 'mp4a' },
-          { format_id: '22', ext: 'mp4', height: 720, width: 1280, filesize: 45000000, vcodec: 'avc1', acodec: 'mp4a' },
-          { format_id: '137', ext: 'mp4', height: 1080, width: 1920, filesize: 90000000, vcodec: 'avc1', acodec: 'mp4a' },
-          { format_id: '251', ext: 'webm', height: 0, vcodec: 'none', acodec: 'opus' }, // audio-only, should be filtered
-        ],
-      } as never);
-
-      const result = await fetcher.fetchMetadata('https://www.youtube.com/watch?v=abc123', 'youtube');
-
-      expect(result.title).toBe('Test Video');
-      expect(result.duration).toBe(300);
-      expect(result.thumbnail).toBe('https://img.youtube.com/thumb.jpg');
-      expect(result.formats).toHaveLength(3);
-      // Should be sorted highest to lowest
-      expect(result.formats[0].resolution).toBe('1080p');
-      expect(result.formats[1].resolution).toBe('720p');
-      expect(result.formats[2].resolution).toBe('360p');
-    });
-
     it('should return a single format for Instagram', async () => {
       mockYtDlp.mockResolvedValue({
         title: 'Instagram Reel',
@@ -67,18 +46,18 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockResolvedValue({
         title: 'Long Video',
         duration: 3601,
-        thumbnail: 'https://img.youtube.com/thumb.jpg',
+        thumbnail: 'https://instagram.com/thumb.jpg',
         formats: [
-          { format_id: '18', ext: 'mp4', height: 720, width: 1280, filesize: 500000000, vcodec: 'avc1', acodec: 'mp4a' },
+          { format_id: '1', ext: 'mp4', height: 720, width: 1280, filesize: 500000000, vcodec: 'avc1', acodec: 'mp4a' },
         ],
       } as never);
 
       await expect(
-        fetcher.fetchMetadata('https://www.youtube.com/watch?v=longvideo', 'youtube')
+        fetcher.fetchMetadata('https://www.instagram.com/reel/longvideo', 'instagram')
       ).rejects.toThrow(VideoFetchError);
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=longvideo', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/longvideo', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('DURATION_EXCEEDED');
@@ -91,49 +70,12 @@ describe('VideoFetcher', () => {
         duration: 3600,
         thumbnail: '',
         formats: [
-          { format_id: '18', ext: 'mp4', height: 720, width: 1280, filesize: 400000000, vcodec: 'avc1', acodec: 'mp4a' },
+          { format_id: '1', ext: 'mp4', height: 720, width: 1280, filesize: 400000000, vcodec: 'avc1', acodec: 'mp4a' },
         ],
       } as never);
 
-      const result = await fetcher.fetchMetadata('https://www.youtube.com/watch?v=exact60', 'youtube');
+      const result = await fetcher.fetchMetadata('https://www.instagram.com/reel/exact60', 'instagram');
       expect(result.duration).toBe(3600);
-    });
-
-    it('should filter out non-mp4 formats for YouTube', async () => {
-      mockYtDlp.mockResolvedValue({
-        title: 'Mixed Formats',
-        duration: 120,
-        thumbnail: '',
-        formats: [
-          { format_id: '18', ext: 'mp4', height: 360, width: 640, filesize: 15000000, vcodec: 'avc1', acodec: 'mp4a' },
-          { format_id: '43', ext: 'webm', height: 360, width: 640, filesize: 12000000, vcodec: 'vp8', acodec: 'vorbis' },
-          { format_id: '22', ext: 'mp4', height: 720, width: 1280, filesize: 45000000, vcodec: 'avc1', acodec: 'mp4a' },
-          { format_id: '248', ext: 'webm', height: 1080, width: 1920, filesize: 80000000, vcodec: 'vp9', acodec: 'none' },
-        ],
-      } as never);
-
-      const result = await fetcher.fetchMetadata('https://www.youtube.com/watch?v=mixed', 'youtube');
-
-      // Only mp4 formats with video should be included
-      expect(result.formats.every((f) => f.ext === 'mp4')).toBe(true);
-      expect(result.formats).toHaveLength(2);
-    });
-
-    it('should deduplicate YouTube formats by resolution, keeping largest file size', async () => {
-      mockYtDlp.mockResolvedValue({
-        title: 'Duplicate Resolutions',
-        duration: 60,
-        thumbnail: '',
-        formats: [
-          { format_id: '18', ext: 'mp4', height: 720, width: 1280, filesize: 30000000, vcodec: 'avc1', acodec: 'mp4a' },
-          { format_id: '22', ext: 'mp4', height: 720, width: 1280, filesize: 50000000, vcodec: 'avc1', acodec: 'mp4a' },
-        ],
-      } as never);
-
-      const result = await fetcher.fetchMetadata('https://www.youtube.com/watch?v=dupes', 'youtube');
-
-      expect(result.formats).toHaveLength(1);
-      expect(result.formats[0].fileSize).toBe(50000000);
     });
   });
 
@@ -142,7 +84,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('This video is private. Sign in if you have access.'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=private', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/p/private', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('PRIVATE');
@@ -164,7 +106,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('This video is age-restricted'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=agegate', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/agegate', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('AGE_RESTRICTED');
@@ -175,7 +117,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('Video not available in your country'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=geoblocked', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/geoblocked', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('GEO_BLOCKED');
@@ -186,7 +128,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('This video is unavailable'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=deleted', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/deleted', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('UNAVAILABLE');
@@ -197,7 +139,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('HTTP Error 429: Too Many Requests. Retry after: 120'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=ratelimit', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/ratelimit', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('RATE_LIMITED');
@@ -209,7 +151,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('Network connection timed out'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=timeout', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/timeout', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('NETWORK_ERROR');
@@ -220,7 +162,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(new Error('Something completely unexpected happened'));
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=unknown', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/unknown', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('NETWORK_ERROR');
@@ -233,7 +175,7 @@ describe('VideoFetcher', () => {
       mockYtDlp.mockRejectedValue(error);
 
       try {
-        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=stderrtest', 'youtube');
+        await fetcher.fetchMetadata('https://www.instagram.com/reel/stderrtest', 'instagram');
       } catch (e) {
         expect(e).toBeInstanceOf(VideoFetchError);
         expect((e as VideoFetchError).code).toBe('PRIVATE');
@@ -250,7 +192,7 @@ describe('VideoFetcher', () => {
         formats: [{ format_id: '0', ext: 'mp4', height: 720, width: 1280, filesize: 1000, vcodec: 'avc1', acodec: 'mp4a' }],
       } as never);
 
-      const result = await fetcher.fetchMetadata('https://www.youtube.com/watch?v=short', 'youtube');
+      const result = await fetcher.fetchMetadata('https://www.instagram.com/reel/short', 'instagram');
       expect(result.duration).toBe(1);
     });
 
@@ -263,7 +205,7 @@ describe('VideoFetcher', () => {
       } as never);
 
       await expect(
-        fetcher.fetchMetadata('https://www.youtube.com/watch?v=toolong', 'youtube')
+        fetcher.fetchMetadata('https://www.instagram.com/reel/toolong', 'instagram')
       ).rejects.toMatchObject({ code: 'DURATION_EXCEEDED' });
     });
   });

@@ -21,9 +21,6 @@ const detector = new PlatformDetector();
 /** Generate a valid Instagram shortcode (1-30 alphanumeric + _ + -) */
 const instagramShortcode = fc.stringMatching(/^[A-Za-z0-9_-]{1,30}$/);
 
-/** Generate a valid YouTube video ID (exactly 11 chars: alphanumeric + _ + -) */
-const youtubeVideoId = fc.stringMatching(/^[A-Za-z0-9_-]{11}$/);
-
 /** Generate a canonical Instagram URL (post or reel) */
 const canonicalInstagramUrl = fc.oneof(
   instagramShortcode.map(id => `https://www.instagram.com/p/${id}`),
@@ -31,15 +28,8 @@ const canonicalInstagramUrl = fc.oneof(
   instagramShortcode.map(id => `https://www.instagram.com/reels/${id}`)
 );
 
-/** Generate a canonical YouTube URL (video, short, or youtu.be) */
-const canonicalYoutubeUrl = fc.oneof(
-  youtubeVideoId.map(id => `https://www.youtube.com/watch?v=${id}`),
-  youtubeVideoId.map(id => `https://www.youtube.com/shorts/${id}`),
-  youtubeVideoId.map(id => `https://youtu.be/${id}`)
-);
-
 /** Generate any valid canonical URL */
-const canonicalUrl = fc.oneof(canonicalInstagramUrl, canonicalYoutubeUrl);
+const canonicalUrl = canonicalInstagramUrl;
 
 // --- Transformation functions ---
 
@@ -50,7 +40,6 @@ const trackingParams = fc.subarray(
     'utm_medium=social',
     'utm_campaign=share',
     'igshid=MzRlODBiNWFlZA',
-    'si=abc123def456',
     'feature=share',
   ],
   { minLength: 0, maxLength: 4 }
@@ -75,8 +64,7 @@ const transformedUrl = fc.tuple(
   if (toggleWww) {
     if (transformed.includes('://www.')) {
       transformed = transformed.replace('://www.', '://');
-    } else if (!transformed.includes('youtu.be')) {
-      // Add www (but not for youtu.be which doesn't use www)
+    } else {
       transformed = transformed.replace('://', '://www.');
     }
   }
@@ -88,8 +76,6 @@ const transformedUrl = fc.tuple(
 
   // Add trailing slash
   if (addSlash && !transformed.endsWith('/')) {
-    // For YouTube watch URLs, add slash before any query params would be weird,
-    // so only add to path-based URLs
     if (!transformed.includes('?')) {
       transformed = transformed + '/';
     }

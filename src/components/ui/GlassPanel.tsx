@@ -15,11 +15,11 @@ export function GlassPanel({ children, className = '' }: GlassPanelProps) {
   return (
     <div
       className={`
-        bg-[var(--color-bg-glass)]
+        bg-(--color-bg-glass)
         backdrop-blur-[18px] backdrop-saturate-[1.05]
-        border border-[var(--color-line-soft)]
-        shadow-[var(--shadow-glass)]
-        rounded-[var(--radius-xl)]
+        border border-line-soft
+        shadow-(--shadow-glass)
+        rounded-xl
         ${className}
       `}
     >

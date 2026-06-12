@@ -32,10 +32,10 @@ describe('URLInputField', () => {
 
     const input = screen.getByRole('textbox');
     fireEvent.paste(input, {
-      clipboardData: { getData: () => '  https://youtube.com/watch?v=abc123def45  ' },
+      clipboardData: { getData: () => '  https://instagram.com/reel/abc123def45  ' },
     });
 
-    expect(onSubmit).toHaveBeenCalledWith('https://youtube.com/watch?v=abc123def45');
+    expect(onSubmit).toHaveBeenCalledWith('https://instagram.com/reel/abc123def45');
   });
 
   it('does not call onSubmit when pasted text is only whitespace', () => {
@@ -98,27 +98,16 @@ describe('URLInputField', () => {
     expect(screen.getByText(/Instagram Reel/)).toBeInTheDocument();
   });
 
-  it('shows platform badge for YouTube Video', () => {
-    render(
-      <URLInputField
-        {...defaultProps}
-        detectedPlatform={{ platform: 'youtube', contentType: 'video' }}
-      />
-    );
-
-    expect(screen.getByText(/YouTube Video/)).toBeInTheDocument();
-  });
-
   it('does not show platform badge when isLoading', () => {
     render(
       <URLInputField
         {...defaultProps}
         isLoading={true}
-        detectedPlatform={{ platform: 'youtube', contentType: 'video' }}
+        detectedPlatform={{ platform: 'instagram', contentType: 'reel' }}
       />
     );
 
-    expect(screen.queryByText(/YouTube Video/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Instagram Reel/)).not.toBeInTheDocument();
   });
 
   it('does not show error element when no error', () => {

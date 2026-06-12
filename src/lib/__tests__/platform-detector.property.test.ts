@@ -17,9 +17,6 @@ describe('Feature: video-downloader-site, Property 1: URL Detection Correctness'
   // Generator for Instagram shortcodes: [A-Za-z0-9_-]+ (1 to 30 chars)
   const instagramShortcode = fc.stringMatching(/^[A-Za-z0-9_-]{1,30}$/);
 
-  // Generator for YouTube video IDs: exactly 11 chars from [A-Za-z0-9_-]
-  const youtubeVideoId = fc.stringMatching(/^[A-Za-z0-9_-]{11}$/);
-
   // Generator for Instagram post URLs
   const instagramPostUrl = fc.tuple(
     fc.constantFrom('https://www.instagram.com', 'https://instagram.com'),
@@ -43,43 +40,10 @@ describe('Feature: video-downloader-site, Property 1: URL Detection Correctness'
     expectedVideoId: shortcode,
   }));
 
-  // Generator for YouTube video URLs (watch?v=)
-  const youtubeVideoUrl = fc.tuple(
-    fc.constantFrom('https://www.youtube.com', 'https://youtube.com', 'https://m.youtube.com'),
-    youtubeVideoId
-  ).map(([base, id]) => ({
-    url: `${base}/watch?v=${id}`,
-    expectedPlatform: 'youtube' as const,
-    expectedContentType: 'video' as const,
-    expectedVideoId: id,
-  }));
-
-  // Generator for YouTube shorts URLs
-  const youtubeShortsUrl = fc.tuple(
-    fc.constantFrom('https://www.youtube.com', 'https://youtube.com', 'https://m.youtube.com'),
-    youtubeVideoId
-  ).map(([base, id]) => ({
-    url: `${base}/shorts/${id}`,
-    expectedPlatform: 'youtube' as const,
-    expectedContentType: 'short' as const,
-    expectedVideoId: id,
-  }));
-
-  // Generator for youtu.be short URLs
-  const youtuBeUrl = youtubeVideoId.map((id) => ({
-    url: `https://youtu.be/${id}`,
-    expectedPlatform: 'youtube' as const,
-    expectedContentType: 'video' as const,
-    expectedVideoId: id,
-  }));
-
   // Combined generator for all valid URL types
   const validUrl = fc.oneof(
     instagramPostUrl,
-    instagramReelUrl,
-    youtubeVideoUrl,
-    youtubeShortsUrl,
-    youtuBeUrl
+    instagramReelUrl
   );
 
   it('correctly detects platform, content type, and video ID for all generated valid URLs', () => {
@@ -119,54 +83,6 @@ describe('Feature: video-downloader-site, Property 1: URL Detection Correctness'
   it('correctly detects Instagram reel URLs', () => {
     fc.assert(
       fc.property(instagramReelUrl, ({ url, expectedPlatform, expectedContentType, expectedVideoId }) => {
-        const result = detector.detect(url);
-
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe(expectedPlatform);
-          expect(result.contentType).toBe(expectedContentType);
-          expect(result.videoId).toBe(expectedVideoId);
-        }
-      }),
-      { numRuns: 100 }
-    );
-  });
-
-  it('correctly detects YouTube video URLs', () => {
-    fc.assert(
-      fc.property(youtubeVideoUrl, ({ url, expectedPlatform, expectedContentType, expectedVideoId }) => {
-        const result = detector.detect(url);
-
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe(expectedPlatform);
-          expect(result.contentType).toBe(expectedContentType);
-          expect(result.videoId).toBe(expectedVideoId);
-        }
-      }),
-      { numRuns: 100 }
-    );
-  });
-
-  it('correctly detects YouTube shorts URLs', () => {
-    fc.assert(
-      fc.property(youtubeShortsUrl, ({ url, expectedPlatform, expectedContentType, expectedVideoId }) => {
-        const result = detector.detect(url);
-
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe(expectedPlatform);
-          expect(result.contentType).toBe(expectedContentType);
-          expect(result.videoId).toBe(expectedVideoId);
-        }
-      }),
-      { numRuns: 100 }
-    );
-  });
-
-  it('correctly detects youtu.be short URLs', () => {
-    fc.assert(
-      fc.property(youtuBeUrl, ({ url, expectedPlatform, expectedContentType, expectedVideoId }) => {
         const result = detector.detect(url);
 
         expect(isDetectSuccess(result)).toBe(true);

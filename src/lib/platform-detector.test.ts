@@ -59,62 +59,6 @@ describe('PlatformDetector', () => {
       });
     });
 
-    describe('YouTube video URLs', () => {
-      it('detects youtube.com/watch?v={id} format', () => {
-        const result = detector.detect('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe('youtube');
-          expect(result.contentType).toBe('video');
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
-        }
-      });
-
-      it('detects m.youtube.com/watch?v={id} format', () => {
-        const result = detector.detect('https://m.youtube.com/watch?v=dQw4w9WgXcQ');
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe('youtube');
-          expect(result.contentType).toBe('video');
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
-        }
-      });
-
-      it('detects youtube.com/watch?v={id} without www', () => {
-        const result = detector.detect('https://youtube.com/watch?v=dQw4w9WgXcQ');
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe('youtube');
-          expect(result.contentType).toBe('video');
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
-        }
-      });
-    });
-
-    describe('YouTube shorts URLs', () => {
-      it('detects youtube.com/shorts/{id} format', () => {
-        const result = detector.detect('https://www.youtube.com/shorts/dQw4w9WgXcQ');
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe('youtube');
-          expect(result.contentType).toBe('short');
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
-        }
-      });
-    });
-
-    describe('YouTube short URLs (youtu.be)', () => {
-      it('detects youtu.be/{id} format', () => {
-        const result = detector.detect('https://youtu.be/dQw4w9WgXcQ');
-        expect(isDetectSuccess(result)).toBe(true);
-        if (isDetectSuccess(result)) {
-          expect(result.platform).toBe('youtube');
-          expect(result.contentType).toBe('video');
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
-        }
-      });
-    });
-
     describe('Edge cases - empty/whitespace input', () => {
       it('returns EMPTY_URL error for empty string', () => {
         const result = detector.detect('');
@@ -136,22 +80,6 @@ describe('PlatformDetector', () => {
     describe('Edge cases - supported domain but invalid path', () => {
       it('returns INVALID_FORMAT for instagram.com without video path', () => {
         const result = detector.detect('https://www.instagram.com/username');
-        expect(isDetectError(result)).toBe(true);
-        if (isDetectError(result)) {
-          expect(result.code).toBe('INVALID_FORMAT');
-        }
-      });
-
-      it('returns INVALID_FORMAT for youtube.com without video path', () => {
-        const result = detector.detect('https://www.youtube.com/channel/UCxyz');
-        expect(isDetectError(result)).toBe(true);
-        if (isDetectError(result)) {
-          expect(result.code).toBe('INVALID_FORMAT');
-        }
-      });
-
-      it('returns INVALID_FORMAT for youtube.com homepage', () => {
-        const result = detector.detect('https://www.youtube.com/');
         expect(isDetectError(result)).toBe(true);
         if (isDetectError(result)) {
           expect(result.code).toBe('INVALID_FORMAT');
@@ -186,7 +114,7 @@ describe('PlatformDetector', () => {
     });
 
     describe('URL normalization within detect', () => {
-      it('handles URLs with tracking params', () => {
+      it('handles Instagram URLs with tracking params', () => {
         const result = detector.detect('https://www.instagram.com/p/ABC123/?utm_source=ig_web&igshid=xyz');
         expect(isDetectSuccess(result)).toBe(true);
         if (isDetectSuccess(result)) {
@@ -194,19 +122,19 @@ describe('PlatformDetector', () => {
         }
       });
 
-      it('handles URLs with leading/trailing whitespace', () => {
-        const result = detector.detect('  https://www.youtube.com/watch?v=dQw4w9WgXcQ  ');
+      it('handles Instagram URLs with leading/trailing whitespace', () => {
+        const result = detector.detect('  https://www.instagram.com/p/ABC123/  ');
         expect(isDetectSuccess(result)).toBe(true);
         if (isDetectSuccess(result)) {
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
+          expect(result.videoId).toBe('ABC123');
         }
       });
 
       it('handles http scheme (normalizes to https)', () => {
-        const result = detector.detect('http://www.youtube.com/watch?v=dQw4w9WgXcQ');
+        const result = detector.detect('http://www.instagram.com/p/ABC123/');
         expect(isDetectSuccess(result)).toBe(true);
         if (isDetectSuccess(result)) {
-          expect(result.videoId).toBe('dQw4w9WgXcQ');
+          expect(result.videoId).toBe('ABC123');
         }
       });
     });
@@ -214,8 +142,8 @@ describe('PlatformDetector', () => {
 
   describe('normalize()', () => {
     it('trims whitespace', () => {
-      const result = detector.normalize('  https://youtube.com/watch?v=abc12345678  ');
-      expect(result).toBe('https://youtube.com/watch?v=abc12345678');
+      const result = detector.normalize('  https://instagram.com/p/ABC12345678  ');
+      expect(result).toBe('https://instagram.com/p/ABC12345678');
     });
 
     it('removes tracking params', () => {
@@ -225,19 +153,13 @@ describe('PlatformDetector', () => {
     });
 
     it('standardizes http to https', () => {
-      const result = detector.normalize('http://www.youtube.com/watch?v=dQw4w9WgXcQ');
+      const result = detector.normalize('http://www.instagram.com/p/ABC123/');
       expect(result.startsWith('https://')).toBe(true);
     });
 
     it('removes trailing slash from paths', () => {
       const result = detector.normalize('https://www.instagram.com/p/ABC123/');
       expect(result.endsWith('/')).toBe(false);
-    });
-
-    it('preserves the v parameter for YouTube', () => {
-      const result = detector.normalize('https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=tracking123');
-      expect(result).toContain('v=dQw4w9WgXcQ');
-      expect(result).not.toContain('si=');
     });
 
     it('returns empty string for empty input', () => {
@@ -257,28 +179,8 @@ describe('PlatformDetector', () => {
       expect(id).toBe('ReelABC');
     });
 
-    it('extracts YouTube video ID from watch URL', () => {
-      const id = detector.extractVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'youtube');
-      expect(id).toBe('dQw4w9WgXcQ');
-    });
-
-    it('extracts YouTube video ID from shorts URL', () => {
-      const id = detector.extractVideoId('https://www.youtube.com/shorts/dQw4w9WgXcQ', 'youtube');
-      expect(id).toBe('dQw4w9WgXcQ');
-    });
-
-    it('extracts YouTube video ID from youtu.be URL', () => {
-      const id = detector.extractVideoId('https://youtu.be/dQw4w9WgXcQ', 'youtube');
-      expect(id).toBe('dQw4w9WgXcQ');
-    });
-
     it('returns null for non-matching URL', () => {
       const id = detector.extractVideoId('https://www.instagram.com/username', 'instagram');
-      expect(id).toBeNull();
-    });
-
-    it('returns null for wrong platform', () => {
-      const id = detector.extractVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'instagram');
       expect(id).toBeNull();
     });
   });

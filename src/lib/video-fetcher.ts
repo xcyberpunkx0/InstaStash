@@ -43,6 +43,7 @@ export interface VideoMetadata {
   duration: number;
   thumbnail: string;
   formats: VideoFormat[];
+  previewVideoUrl?: string;
 }
 
 /** Error thrown by VideoFetcher with a typed error code */
@@ -142,48 +143,6 @@ function buildQualityLabel(height: number, fileSize: number): string {
   return `${resolution}${hdSuffix} (~${sizeMB}MB)`;
 }
 
-/** Filter and map YouTube formats to VideoFormat[] */
-function mapYouTubeFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
-  // Filter to mp4 formats that have both video and audio, or at least video
-  const videoFormats = rawFormats.filter((f) => {
-    const isMp4 = f.ext === 'mp4';
-    const hasVideo = f.vcodec !== 'none' && f.vcodec !== undefined;
-    const height = parseResolutionHeight(f);
-    return isMp4 && hasVideo && height > 0;
-  });
-
-  // Deduplicate by resolution height, keeping the one with the largest file size
-  const byHeight = new Map<number, YtDlpFormat>();
-  for (const format of videoFormats) {
-    const height = parseResolutionHeight(format);
-    const existing = byHeight.get(height);
-    const currentSize = format.filesize ?? format.filesize_approx ?? 0;
-    const existingSize = existing ? (existing.filesize ?? existing.filesize_approx ?? 0) : 0;
-    if (!existing || currentSize > existingSize) {
-      byHeight.set(height, format);
-    }
-  }
-
-  // Convert to VideoFormat[] sorted by resolution descending
-  const formats: VideoFormat[] = Array.from(byHeight.entries())
-    .sort(([a], [b]) => b - a)
-    .map(([height, format]) => {
-      const fileSize = format.filesize ?? format.filesize_approx ?? 0;
-      const classified = classifyYtDlpFormat(format);
-      return {
-        formatId: format.format_id,
-        resolution: buildResolutionLabel(height),
-        fileSize,
-        ext: 'mp4',
-        quality: buildQualityLabel(height, fileSize),
-        directUrl: classified.directUrl,
-        hasAudio: classified.hasAudio,
-        expiresAt: classified.expiresAt,
-      };
-    });
-
-  return formats;
-}
 
 /** Map Instagram format to a single VideoFormat at original resolution */
 function mapInstagramFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
@@ -223,6 +182,39 @@ function mapInstagramFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
   ];
 }
 
+/** Find a playable progressive URL from raw formats */
+function findPreviewUrl(rawFormats: YtDlpFormat[]): string | undefined {
+  // Look for format with format_id === '1' first (Instagram progressive format)
+  const format1 = rawFormats.find(f => f.format_id === '1');
+  if (format1 && format1.url) return format1.url;
+
+  // Otherwise, look for any format that has both video and audio and is not DASH/manifest
+  for (const format of rawFormats) {
+    const acodec = (format.acodec ?? '').toLowerCase();
+    const vcodec = (format.vcodec ?? '').toLowerCase();
+    const hasAudio = acodec !== '' && acodec !== 'none';
+    const hasVideo = vcodec !== '' && vcodec !== 'none';
+    
+    const proto = (format.protocol ?? '').toLowerCase();
+    const isSegmented = proto.includes('dash') || proto.includes('m3u8') || proto.includes('hls') || format.manifest_url;
+
+    if (hasAudio && hasVideo && !isSegmented && format.url) {
+      return format.url;
+    }
+  }
+
+  // Fallback to the first format with a URL that is not segmented
+  for (const format of rawFormats) {
+    const proto = (format.protocol ?? '').toLowerCase();
+    const isSegmented = proto.includes('dash') || proto.includes('m3u8') || proto.includes('hls') || format.manifest_url;
+    if (!isSegmented && format.url) {
+      return format.url;
+    }
+  }
+
+  return undefined;
+}
+
 // ─── VideoFetcher Class ──────────────────────────────────────────────────────
 
 export class VideoFetcher {
@@ -232,29 +224,31 @@ export class VideoFetcher {
    * Throws VideoFetchError with typed error codes on failure.
    */
   async fetchMetadata(url: string, platform: Platform): Promise<VideoMetadata> {
-    // For Instagram: try scraping first (no auth needed), fall back to yt-dlp
-    if (platform === 'instagram') {
-      try {
-        const scraped = await scrapeInstagramVideo(url);
-        return {
-          title: scraped.title,
-          duration: scraped.duration,
-          thumbnail: scraped.thumbnailUrl,
-          formats: [{
-            formatId: 'original',
-            resolution: 'original',
-            fileSize: 0,
-            ext: 'mp4',
-            quality: 'Original',
-            // Scraper gives us a CDN URL — fast path is available.
-            directUrl: scraped.videoUrl,
-            hasAudio: true,
-            expiresAt: extractExpiry(scraped.videoUrl),
-          }],
-        };
-      } catch {
-        // Scraping failed, fall through to yt-dlp
-      }
+    if (platform !== 'instagram') {
+      throw new VideoFetchError('Unsupported platform', 'NETWORK_ERROR');
+    }
+
+    try {
+      const scraped = await scrapeInstagramVideo(url);
+      return {
+        title: scraped.title,
+        duration: scraped.duration,
+        thumbnail: scraped.thumbnailUrl,
+        formats: [{
+          formatId: 'original',
+          resolution: 'original',
+          fileSize: 0,
+          ext: 'mp4',
+          quality: 'Original',
+          // Scraper gives us a CDN URL — fast path is available.
+          directUrl: scraped.videoUrl,
+          hasAudio: true,
+          expiresAt: extractExpiry(scraped.videoUrl),
+        }],
+        previewVideoUrl: scraped.videoUrl,
+      };
+    } catch {
+      // Scraping failed, fall through to yt-dlp
     }
 
     let output: YtDlpOutput;
@@ -278,17 +272,15 @@ export class VideoFetcher {
       );
     }
 
-    // Map formats based on platform
-    const formats =
-      platform === 'youtube'
-        ? mapYouTubeFormats(output.formats)
-        : mapInstagramFormats(output.formats);
+    // Map formats
+    const formats = mapInstagramFormats(output.formats);
 
     return {
       title: output.title,
       duration: output.duration,
       thumbnail: output.thumbnail ?? '',
       formats,
+      previewVideoUrl: findPreviewUrl(output.formats),
     };
   }
 

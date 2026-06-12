@@ -14,7 +14,7 @@ export interface SketchBorderProps {
  */
 export function SketchBorder({ children, className = '' }: SketchBorderProps) {
   return (
-    <div className={`relative bg-[var(--color-bg-surface)] rounded-[var(--radius-lg)] border border-[var(--color-line-soft)] shadow-[var(--shadow-card)] ${className}`}>
+    <div className={`relative bg-(--color-bg-surface) rounded-lg border border-line-soft shadow-(--shadow-card) ${className}`}>
       {children}
     </div>
   );

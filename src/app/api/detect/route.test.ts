@@ -31,28 +31,6 @@ describe('POST /api/detect', () => {
     expect(data.normalizedUrl).toBeDefined();
   });
 
-  it('returns detected platform for a valid YouTube video URL', async () => {
-    const req = createRequest({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' });
-    const res = await POST(req);
-    const data = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(data.platform).toBe('youtube');
-    expect(data.contentType).toBe('video');
-    expect(data.videoId).toBe('dQw4w9WgXcQ');
-  });
-
-  it('returns detected platform for a YouTube Shorts URL', async () => {
-    const req = createRequest({ url: 'https://www.youtube.com/shorts/dQw4w9WgXcQ' });
-    const res = await POST(req);
-    const data = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(data.platform).toBe('youtube');
-    expect(data.contentType).toBe('short');
-    expect(data.videoId).toBe('dQw4w9WgXcQ');
-  });
-
   it('returns detected platform for an Instagram reel URL', async () => {
     const req = createRequest({ url: 'https://www.instagram.com/reel/XYZ789/' });
     const res = await POST(req);
@@ -82,7 +60,6 @@ describe('POST /api/detect', () => {
     expect(res.status).toBe(400);
     expect(data.code).toBe('EMPTY_URL');
     expect(data.supportedPlatforms).toContain('Instagram');
-    expect(data.supportedPlatforms).toContain('YouTube');
   });
 
   it('returns EMPTY_URL error for whitespace-only string', async () => {
@@ -115,7 +92,6 @@ describe('POST /api/detect', () => {
     expect(res.status).toBe(400);
     expect(data.code).toBe('UNSUPPORTED_PLATFORM');
     expect(data.supportedPlatforms).toContain('Instagram');
-    expect(data.supportedPlatforms).toContain('YouTube');
   });
 
   it('returns INVALID_FORMAT error for supported domain with invalid path', async () => {
@@ -138,24 +114,14 @@ describe('POST /api/detect', () => {
     expect(data.code).toBe('EMPTY_URL');
   });
 
-  it('handles youtu.be short URLs', async () => {
-    const req = createRequest({ url: 'https://youtu.be/dQw4w9WgXcQ' });
-    const res = await POST(req);
-    const data = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(data.platform).toBe('youtube');
-    expect(data.videoId).toBe('dQw4w9WgXcQ');
-  });
-
   it('strips tracking parameters from URLs', async () => {
-    const req = createRequest({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&utm_source=twitter&si=abc123' });
+    const req = createRequest({ url: 'https://www.instagram.com/p/ABC123xyz/?utm_source=twitter&si=abc123' });
     const res = await POST(req);
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(data.platform).toBe('youtube');
-    expect(data.videoId).toBe('dQw4w9WgXcQ');
+    expect(data.platform).toBe('instagram');
+    expect(data.videoId).toBe('ABC123xyz');
   });
 
   it('returns TIMEOUT error with status 400 when detection exceeds 1 second', async () => {
@@ -167,7 +133,7 @@ describe('POST /api/detect', () => {
       return new Promise(() => {}) as unknown as ReturnType<typeof originalDetect>;
     };
 
-    const req = createRequest({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' });
+    const req = createRequest({ url: 'https://www.instagram.com/p/ABC123/' });
     const resPromise = POST(req);
 
     // Advance timers past the 1-second timeout
@@ -180,7 +146,6 @@ describe('POST /api/detect', () => {
     expect(data.code).toBe('TIMEOUT');
     expect(data.error).toBe('That took too long! Try pasting the URL again.');
     expect(data.supportedPlatforms).toContain('Instagram');
-    expect(data.supportedPlatforms).toContain('YouTube');
 
     // Restore original
     platformDetector.detect = originalDetect;

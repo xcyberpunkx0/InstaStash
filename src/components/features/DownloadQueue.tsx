@@ -40,9 +40,9 @@ export function DownloadQueueItem({
     <div className="
       grid grid-cols-[120px_1fr_auto] gap-4 items-center
       p-3 pr-[18px]
-      bg-[var(--color-bg-surface)]
+      bg-(--color-bg-surface)
       rounded-[16px]
-      border border-[var(--color-line-soft)]
+      border border-line-soft
       shadow-[0_1px_0_rgba(31,27,22,0.04),0_10px_22px_-14px_rgba(31,27,22,0.18)]
     ">
       {/* Thumbnail */}
@@ -51,7 +51,7 @@ export function DownloadQueueItem({
         style={{ background: thumbnail ?? 'linear-gradient(135deg, #3A2618 0%, #C97B4E 100%)' }}
       >
         {duration && (
-          <div className="absolute right-1.5 bottom-1.5 px-1.5 py-0.5 rounded-[var(--radius-pill)] bg-[rgba(31,27,22,0.72)] backdrop-blur-[4px] text-[var(--color-paper-50)] font-[family-name:var(--font-mono)] text-[10px] z-[2]">
+          <div className="absolute right-1.5 bottom-1.5 px-1.5 py-0.5 rounded-pill bg-[rgba(31,27,22,0.72)] backdrop-blur-[4px] text-(--color-paper-50) font-mono text-[10px] z-[2]">
             {duration}
           </div>
         )}
@@ -60,16 +60,16 @@ export function DownloadQueueItem({
       {/* Info */}
       <div className="min-w-0">
         {platform && (
-          <div className="font-[family-name:var(--font-grotesk)] font-semibold text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-400)] mb-[3px]">
+          <div className="font-grotesk font-semibold text-[10px] uppercase tracking-[0.14em] text-(--color-ink-400) mb-[3px]">
             {platform}
           </div>
         )}
         {title && (
-          <h3 className="font-[family-name:var(--font-display)] font-medium text-[18px] leading-[1.15] text-[var(--color-ink-900)] m-0 mb-1.5 truncate">
+          <h3 className="font-display font-medium text-[18px] leading-[1.15] text-(--color-ink-900) m-0 mb-1.5 truncate">
             {title}
           </h3>
         )}
-        <div className="flex items-center gap-2.5 font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-ink-500)]">
+        <div className="flex items-center gap-2.5 font-mono text-[11px] text-(--color-ink-500)">
           <StatusPill variant={status}>
             {status === 'downloading' ? 'downloading' : status === 'complete' ? 'downloaded' : status === 'error' ? 'failed' : 'queued'}
           </StatusPill>
@@ -138,8 +138,8 @@ function ActionButton({ onClick, title, icon, primary }: { onClick?: () => void;
         w-8 h-8 rounded-full border-0 cursor-pointer inline-flex items-center justify-center
         transition-colors duration-[160ms]
         ${primary
-          ? 'bg-[var(--color-ink-900)] text-[var(--color-paper-50)] hover:bg-[var(--color-ink-700)]'
-          : 'bg-[var(--color-paper-200)] text-[var(--color-ink-700)] hover:bg-[var(--color-paper-300)]'
+          ? 'bg-(--color-ink-900) text-(--color-paper-50) hover:bg-(--color-ink-700)'
+          : 'bg-(--color-paper-200) text-(--color-ink-700) hover:bg-(--color-paper-300)'
         }
       `}
     >

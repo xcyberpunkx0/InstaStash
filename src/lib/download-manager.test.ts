@@ -74,13 +74,21 @@ describe('enforceMonotonic', () => {
 
 // ─── Integration tests for DownloadManager ───────────────────────────────────
 
-// Mock child_process.spawn
-vi.mock('child_process', () => ({
-  spawn: vi.fn(),
-}));
+const { mockSpawn } = vi.hoisted(() => {
+  return {
+    mockSpawn: vi.fn(),
+  };
+});
 
-import { spawn } from 'child_process';
-const mockSpawn = vi.mocked(spawn);
+vi.mock('child_process', () => {
+  const m = {
+    spawn: mockSpawn,
+  };
+  return {
+    ...m,
+    default: m,
+  };
+});
 
 function createMockProcess(): {
   process: ChildProcess;
@@ -115,11 +123,11 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    manager.download('https://instagram.com/reel/abc123', '22', onProgress);
 
     expect(mockSpawn).toHaveBeenCalledWith(
       'yt-dlp',
-      ['-f', '22', '-o', '-', '--newline', '--no-part', 'https://youtube.com/watch?v=abc123'],
+      ['-f', '22', '-o', '-', '--newline', '--no-part', 'https://instagram.com/reel/abc123'],
       { stdio: ['ignore', 'pipe', 'pipe'] }
     );
   });
@@ -129,7 +137,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     // Simulate progress output
@@ -147,7 +155,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
 
     // Simulate progress that goes backwards (shouldn't emit the lower value)
     stderr.emit('data', Buffer.from('[download]  50.0% of ~50.00MiB at 2.50MiB/s ETA 00:10\n'));
@@ -166,7 +174,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     // Simulate video data
@@ -183,7 +191,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     // Simulate some data then close
@@ -202,7 +210,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
 
     stderr.emit('data', Buffer.from('[download]  50.0% of ~50.00MiB at 2.50MiB/s ETA 00:10\n'));
     (mockProc as EventEmitter).emit('close', 0);
@@ -216,7 +224,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     (mockProc as EventEmitter).emit('close', 1);
@@ -229,7 +237,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     // Advance time by 30 seconds
@@ -244,7 +252,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     // Advance 20 seconds
@@ -271,7 +279,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
 
     // Advance 20 seconds
     vi.advanceTimersByTime(20_000);
@@ -291,7 +299,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
     const reader = stream.getReader();
 
     (mockProc as EventEmitter).emit('error', new Error('ENOENT: yt-dlp not found'));
@@ -304,7 +312,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    const stream = manager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    const stream = manager.download('https://instagram.com/reel/abc123', '22', onProgress);
 
     stream.cancel();
 
@@ -317,7 +325,7 @@ describe('DownloadManager', () => {
     mockSpawn.mockReturnValue(mockProc as any);
 
     const onProgress = vi.fn();
-    customManager.download('https://youtube.com/watch?v=abc123', '22', onProgress);
+    customManager.download('https://instagram.com/reel/abc123', '22', onProgress);
 
     expect(mockSpawn).toHaveBeenCalledWith(
       '/usr/local/bin/yt-dlp',

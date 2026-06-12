@@ -15,18 +15,6 @@ const testPlatforms: PlatformExample[] = [
       'Click download',
     ],
   },
-  {
-    name: 'YouTube',
-    icon: <span data-testid="youtube-icon">YT</span>,
-    exampleUrls: ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
-    steps: [
-      'Open YouTube and find the video',
-      'Copy the URL',
-      'Paste it above',
-      'Choose quality',
-      'Click download',
-    ],
-  },
 ];
 
 describe('HelpSection', () => {
@@ -35,30 +23,26 @@ describe('HelpSection', () => {
     expect(screen.getByText('How to download')).toBeInTheDocument();
   });
 
-  it('renders platform names as headings', () => {
+  it('renders platform name as heading', () => {
     render(<HelpSection platforms={testPlatforms} />);
     expect(screen.getByText('Instagram')).toBeInTheDocument();
-    expect(screen.getByText('YouTube')).toBeInTheDocument();
+    expect(screen.queryByText('YouTube')).not.toBeInTheDocument();
   });
 
-  it('renders platform icons', () => {
+  it('renders platform icon', () => {
     render(<HelpSection platforms={testPlatforms} />);
     expect(screen.getByTestId('instagram-icon')).toBeInTheDocument();
-    expect(screen.getByTestId('youtube-icon')).toBeInTheDocument();
   });
 
-  it('renders step-by-step instructions for each platform', () => {
+  it('renders step-by-step instructions for the platform', () => {
     render(<HelpSection platforms={testPlatforms} />);
     expect(screen.getByText('Open Instagram and find the video')).toBeInTheDocument();
     expect(screen.getByText('Copy the link')).toBeInTheDocument();
-    expect(screen.getByText('Open YouTube and find the video')).toBeInTheDocument();
-    expect(screen.getAllByText('Choose quality').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders example URLs for each platform', () => {
+  it('renders example URLs', () => {
     render(<HelpSection platforms={testPlatforms} />);
     expect(screen.getByText('https://www.instagram.com/p/ABC123/')).toBeInTheDocument();
-    expect(screen.getByText('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toBeInTheDocument();
   });
 
   it('uses proper heading hierarchy (h2 for title, h3 for platforms)', () => {
@@ -67,7 +51,7 @@ describe('HelpSection', () => {
     expect(title).toBeInTheDocument();
 
     const platformHeadings = screen.getAllByRole('heading', { level: 3 });
-    expect(platformHeadings.length).toBeGreaterThanOrEqual(2);
+    expect(platformHeadings.length).toBe(1);
   });
 
   it('uses ordered list semantics for steps', () => {

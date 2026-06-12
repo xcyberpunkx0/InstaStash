@@ -42,13 +42,13 @@ export function FeaturesGrid() {
   return (
     <section id="features" className="max-w-[1280px] mx-auto px-6 md:px-12 py-[72px]">
       <div className="max-w-[760px] mb-14">
-        <span className="font-[family-name:var(--font-hand)] text-[24px] text-[var(--color-terra-600)] inline-block mb-1.5" style={{ transform: 'rotate(-1.5deg)' }}>
+        <span className="font-hand text-[24px] text-terra-600 inline-block mb-1.5" style={{ transform: 'rotate(-1.5deg)' }}>
           small tools, made carefully —
         </span>
-        <h2 className="font-[family-name:var(--font-display)] font-medium italic text-[clamp(36px,5vw,56px)] leading-[1.04] tracking-[-0.015em] text-[var(--color-ink-900)] m-0 mb-4 text-balance">
+        <h2 className="font-display font-medium italic text-[clamp(36px,5vw,56px)] leading-[1.04] tracking-[-0.015em] text-(--color-ink-900) m-0 mb-4 text-balance">
           Six quiet features<br />doing one loud thing.
         </h2>
-        <p className="text-[18px] leading-[1.6] text-[var(--color-ink-500)] max-w-[56ch]">
+        <p className="text-[18px] leading-[1.6] text-(--color-ink-500) max-w-[56ch]">
           No bloat. No upsell. Just the bits a creative person actually needs to save what they find online.
         </p>
       </div>
@@ -59,28 +59,28 @@ export function FeaturesGrid() {
             key={feature.title}
             className="
               relative p-7 pb-8
-              bg-[var(--color-bg-surface)]
+              bg-(--color-bg-surface)
               bg-blend-multiply
               rounded-[18px]
-              border border-[var(--color-line-soft)]
-              shadow-[var(--shadow-card)]
+              border border-line-soft
+              shadow-(--shadow-card)
               overflow-hidden
-              transition-[transform,box-shadow] duration-[240ms] ease-[var(--ease-paper)]
-              hover:translate-y-[-3px] hover:shadow-[var(--shadow-lift)]
+              transition-[transform,box-shadow] duration-[240ms] ease-(--ease-paper)
+              hover:translate-y-[-3px] hover:shadow-(--shadow-lift)
             "
           >
             {feature.note && (
-              <span className="absolute right-3.5 top-3 font-[family-name:var(--font-hand)] text-[18px] text-[var(--color-terra-600)]" style={{ transform: 'rotate(-3deg)' }}>
+              <span className="absolute right-3.5 top-3 font-hand text-[18px] text-terra-600" style={{ transform: 'rotate(-3deg)' }}>
                 {feature.note}
               </span>
             )}
-            <div className="w-11 h-11 rounded-[12px] bg-[var(--color-paper-200)] inline-flex items-center justify-center text-[var(--color-ink-900)] mb-[18px]">
+            <div className="w-11 h-11 rounded-[12px] bg-(--color-paper-200) inline-flex items-center justify-center text-(--color-ink-900) mb-[18px]">
               <span className="w-[22px] h-[22px]">{feature.icon}</span>
             </div>
-            <h3 className="font-[family-name:var(--font-display)] font-medium text-[26px] leading-[1.1] text-[var(--color-ink-900)] m-0 mb-2">
+            <h3 className="font-display font-medium text-[26px] leading-[1.1] text-(--color-ink-900) m-0 mb-2">
               {feature.title}
             </h3>
-            <p className="text-[var(--color-ink-500)] text-[15px] leading-[1.55] m-0">
+            <p className="text-(--color-ink-500) text-[15px] leading-[1.55] m-0">
               {feature.description}
             </p>
           </article>

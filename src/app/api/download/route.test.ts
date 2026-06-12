@@ -1,31 +1,52 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from './route';
+import { EventEmitter } from 'events';
+import { Readable } from 'stream';
 
-// Mock the download-manager module
-vi.mock('@/lib/download-manager', () => {
-  const DownloadTimeoutError = class extends Error {
-    constructor(message = 'Download timed out') {
-      super(message);
-      this.name = 'DownloadTimeoutError';
-    }
-  };
-
-  const DownloadFailedError = class extends Error {
-    constructor(message = 'Download failed') {
-      super(message);
-      this.name = 'DownloadFailedError';
-    }
-  };
-
+const { mockSpawn, mockMkdtemp, mockReaddir, mockRm, mockStat, mockCreateReadStream } = vi.hoisted(() => {
   return {
-    DownloadTimeoutError,
-    DownloadFailedError,
-    DownloadManager: vi.fn(),
+    mockSpawn: vi.fn(),
+    mockMkdtemp: vi.fn(),
+    mockReaddir: vi.fn(),
+    mockRm: vi.fn(),
+    mockStat: vi.fn(),
+    mockCreateReadStream: vi.fn(),
   };
 });
 
-import { DownloadManager, DownloadTimeoutError, DownloadFailedError } from '@/lib/download-manager';
+vi.mock('child_process', () => {
+  const m = { spawn: mockSpawn };
+  return { ...m, default: m };
+});
+
+vi.mock('fs', () => {
+  const m = { createReadStream: mockCreateReadStream };
+  return { ...m, default: m };
+});
+
+vi.mock('fs/promises', () => {
+  const m = {
+    mkdtemp: mockMkdtemp,
+    readdir: mockReaddir,
+    rm: mockRm,
+    stat: mockStat,
+  };
+  return { ...m, default: m };
+});
+
+class MockProcess extends EventEmitter {
+  stdout: Readable;
+  stderr: Readable;
+  constructor() {
+    super();
+    this.stdout = new Readable({ read() {} });
+    this.stderr = new Readable({ read() {} });
+  }
+  kill() {
+    /* killed by route on failure/abort */
+  }
+}
 
 function createRequest(body: unknown): NextRequest {
   return new NextRequest('http://localhost:3000/api/download', {
@@ -43,19 +64,20 @@ function createInvalidRequest(): NextRequest {
   });
 }
 
-async function readSSEEvents(response: Response): Promise<Array<Record<string, unknown>>> {
-  const text = await response.text();
-  const events: Array<Record<string, unknown>> = [];
-
-  const lines = text.split('\n\n').filter(Boolean);
-  for (const line of lines) {
-    const dataMatch = line.match(/^data: (.+)$/);
-    if (dataMatch) {
-      events.push(JSON.parse(dataMatch[1]));
-    }
-  }
-
-  return events;
+/** Configures the happy-path mocks: temp dir, produced file, read stream. */
+function mockSuccessfulDownload(content = 'dummy file content', fileName = 'video.mp4') {
+  const proc = new MockProcess();
+  mockSpawn.mockReturnValue(proc as never);
+  mockMkdtemp.mockResolvedValue('/tmp/vdl-test');
+  mockReaddir.mockResolvedValue([fileName]);
+  mockStat.mockResolvedValue({ size: content.length });
+  mockRm.mockResolvedValue(undefined);
+  mockCreateReadStream.mockImplementation(() => {
+    const stream = Readable.from([Buffer.from(content)]);
+    return stream;
+  });
+  setTimeout(() => proc.emit('close', 0), 10);
+  return proc;
 }
 
 describe('POST /api/download', () => {
@@ -63,244 +85,197 @@ describe('POST /api/download', () => {
     vi.clearAllMocks();
   });
 
-  it('returns error event for invalid JSON body', async () => {
-    const request = createInvalidRequest();
-    const response = await POST(request);
+  it('returns 400 JSON error for invalid JSON body', async () => {
+    const response = await POST(createInvalidRequest());
 
     expect(response.status).toBe(400);
-    expect(response.headers.get('Content-Type')).toBe('text/event-stream');
-
-    const events = await readSSEEvents(response);
-    expect(events).toHaveLength(1);
-    expect(events[0]).toEqual({
-      type: 'error',
+    const json = await response.json();
+    expect(json).toEqual({
+      error: 'Invalid request body',
       code: 'INVALID_REQUEST',
-      message: 'Invalid request body',
     });
   });
 
-  it('returns error event when url is missing', async () => {
-    const request = createRequest({ url: '', formatId: 'best' });
-    const response = await POST(request);
+  it('returns 400 JSON error when url is missing', async () => {
+    const response = await POST(createRequest({ url: '', formatId: 'best' }));
 
     expect(response.status).toBe(400);
-    const events = await readSSEEvents(response);
-    expect(events[0]).toEqual({
-      type: 'error',
+    const json = await response.json();
+    expect(json).toEqual({
+      error: 'Both url and formatId are required',
       code: 'INVALID_REQUEST',
-      message: 'Both url and formatId are required',
     });
   });
 
-  it('returns error event when formatId is missing', async () => {
-    const request = createRequest({ url: 'https://youtube.com/watch?v=abc', formatId: '' });
-    const response = await POST(request);
-
-    expect(response.status).toBe(400);
-    const events = await readSSEEvents(response);
-    expect(events[0]).toEqual({
-      type: 'error',
-      code: 'INVALID_REQUEST',
-      message: 'Both url and formatId are required',
-    });
-  });
-
-  it('sets correct SSE headers', async () => {
-    // Mock a successful download
-    const mockDownload = vi.fn().mockReturnValue(
-      new ReadableStream({
-        start(controller) {
-          controller.enqueue(new Uint8Array([1, 2, 3]));
-          controller.close();
-        },
-      })
+  it('returns 400 JSON error when formatId is missing', async () => {
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/abc', formatId: '' }),
     );
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
 
-    const request = createRequest({ url: 'https://youtube.com/watch?v=abc123', formatId: '22' });
-    const response = await POST(request);
-
-    expect(response.headers.get('Content-Type')).toBe('text/event-stream');
-    expect(response.headers.get('Cache-Control')).toBe('no-cache');
-    expect(response.headers.get('Connection')).toBe('keep-alive');
+    expect(response.status).toBe(400);
+    const json = await response.json();
+    expect(json).toEqual({
+      error: 'Both url and formatId are required',
+      code: 'INVALID_REQUEST',
+    });
   });
 
-  it('streams progress events and emits complete event on success', async () => {
-    let progressCallback: ((pct: number) => void) | null = null;
+  it('returns 400 JSON error for non-Instagram URLs', async () => {
+    const response = await POST(
+      createRequest({ url: 'https://example.com/video/123', formatId: 'best' }),
+    );
 
-    const mockDownload = vi.fn().mockImplementation((_url, _fmt, onProgress) => {
-      progressCallback = onProgress;
-      return new ReadableStream({
-        start(controller) {
-          // Simulate progress
-          onProgress(25);
-          onProgress(50);
-          onProgress(75);
-          onProgress(100);
-          // Emit some data
-          controller.enqueue(new Uint8Array([1, 2, 3, 4, 5]));
-          controller.close();
-        },
-      });
+    expect(response.status).toBe(400);
+    const json = await response.json();
+    expect(json).toEqual({
+      error: 'Only Instagram post/reel URLs are supported',
+      code: 'INVALID_REQUEST',
     });
+    expect(mockSpawn).not.toHaveBeenCalled();
+  });
 
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
+  it('returns video/mp4 with Content-Disposition on success', async () => {
+    mockSuccessfulDownload();
 
-    const request = createRequest({ url: 'https://youtube.com/watch?v=test123', formatId: '22' });
-    const response = await POST(request);
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/abc123/', formatId: 'best' }),
+    );
 
     expect(response.status).toBe(200);
-
-    const events = await readSSEEvents(response);
-
-    // Should have progress events and a complete event
-    const progressEvents = events.filter((e) => e.type === 'progress');
-    const completeEvents = events.filter((e) => e.type === 'complete');
-
-    expect(progressEvents.length).toBeGreaterThan(0);
-    expect(completeEvents).toHaveLength(1);
-
-    // Verify complete event structure
-    expect(completeEvents[0]).toMatchObject({
-      type: 'complete',
-      filename: expect.stringContaining('.mp4'),
-      size: expect.any(Number),
-    });
+    expect(response.headers.get('Content-Type')).toBe('video/mp4');
+    expect(response.headers.get('Content-Disposition')).toBe('attachment; filename="abc123.mp4"');
+    expect(response.headers.get('Content-Length')).toBe('18'); // 'dummy file content'.length
   });
 
-  it('emits error event on download timeout', async () => {
-    const mockDownload = vi.fn().mockImplementation(() => {
-      return new ReadableStream({
-        start(controller) {
-          controller.error(new DownloadTimeoutError('Download timed out'));
-        },
-      });
-    });
+  it('returns binary file data on success', async () => {
+    mockSuccessfulDownload();
 
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
-
-    const request = createRequest({ url: 'https://youtube.com/watch?v=timeout', formatId: '22' });
-    const response = await POST(request);
-
-    const events = await readSSEEvents(response);
-    const errorEvents = events.filter((e) => e.type === 'error');
-
-    expect(errorEvents).toHaveLength(1);
-    expect(errorEvents[0]).toEqual({
-      type: 'error',
-      code: 'DOWNLOAD_TIMEOUT',
-      message: 'Download seems stuck. Want to try again?',
-    });
-  });
-
-  it('emits error event on download failure', async () => {
-    const mockDownload = vi.fn().mockImplementation(() => {
-      return new ReadableStream({
-        start(controller) {
-          controller.error(new DownloadFailedError('yt-dlp exited with code 1'));
-        },
-      });
-    });
-
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
-
-    const request = createRequest({ url: 'https://youtube.com/watch?v=fail', formatId: '22' });
-    const response = await POST(request);
-
-    const events = await readSSEEvents(response);
-    const errorEvents = events.filter((e) => e.type === 'error');
-
-    expect(errorEvents).toHaveLength(1);
-    expect(errorEvents[0]).toEqual({
-      type: 'error',
-      code: 'DOWNLOAD_FAILED',
-      message: 'yt-dlp exited with code 1',
-    });
-  });
-
-  it('generates filename from YouTube URL with video ID', async () => {
-    const mockDownload = vi.fn().mockImplementation((_url, _fmt, onProgress) => {
-      return new ReadableStream({
-        start(controller) {
-          onProgress(100);
-          controller.enqueue(new Uint8Array([1, 2, 3]));
-          controller.close();
-        },
-      });
-    });
-
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
-
-    const request = createRequest({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', formatId: '22' });
-    const response = await POST(request);
-
-    const events = await readSSEEvents(response);
-    const completeEvent = events.find((e) => e.type === 'complete');
-
-    expect(completeEvent).toBeDefined();
-    expect(completeEvent!.filename).toBe('dQw4w9WgXcQ_22.mp4');
-  });
-
-  it('generates filename from Instagram URL path', async () => {
-    const mockDownload = vi.fn().mockImplementation((_url, _fmt, onProgress) => {
-      return new ReadableStream({
-        start(controller) {
-          onProgress(100);
-          controller.enqueue(new Uint8Array([10, 20]));
-          controller.close();
-        },
-      });
-    });
-
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
-
-    const request = createRequest({ url: 'https://www.instagram.com/reel/ABC123xyz/', formatId: 'best' });
-    const response = await POST(request);
-
-    const events = await readSSEEvents(response);
-    const completeEvent = events.find((e) => e.type === 'complete');
-
-    expect(completeEvent).toBeDefined();
-    expect(completeEvent!.filename).toBe('ABC123xyz_best.mp4');
-  });
-
-  it('passes url and formatId to DownloadManager', async () => {
-    const mockDownload = vi.fn().mockImplementation((_url, _fmt, onProgress) => {
-      return new ReadableStream({
-        start(controller) {
-          onProgress(100);
-          controller.enqueue(new Uint8Array([1]));
-          controller.close();
-        },
-      });
-    });
-
-    (DownloadManager as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      download: mockDownload,
-    }));
-
-    const request = createRequest({ url: 'https://youtube.com/watch?v=test', formatId: '137' });
-    await POST(request);
-
-    // Wait for the async download to complete
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(mockDownload).toHaveBeenCalledWith(
-      'https://youtube.com/watch?v=test',
-      '137',
-      expect.any(Function)
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/test123/', formatId: 'best' }),
     );
+
+    expect(response.status).toBe(200);
+    const body = await response.arrayBuffer();
+    expect(Buffer.from(body).toString()).toBe('dummy file content');
+  });
+
+  it('derives filename extension from the produced file', async () => {
+    mockSuccessfulDownload('webm-bytes', 'video.webm');
+
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/abc123/', formatId: 'best' }),
+    );
+
+    expect(response.headers.get('Content-Type')).toBe('video/webm');
+    expect(response.headers.get('Content-Disposition')).toBe('attachment; filename="abc123.webm"');
+  });
+
+  it('returns 502 JSON error with the yt-dlp ERROR line on failure', async () => {
+    const proc = new MockProcess();
+    mockSpawn.mockReturnValue(proc as never);
+    mockMkdtemp.mockResolvedValue('/tmp/vdl-test');
+    mockRm.mockResolvedValue(undefined);
+
+    setTimeout(() => {
+      proc.stderr.emit('data', Buffer.from('ERROR: [instagram] something went wrong\n'));
+      proc.emit('close', 1);
+    }, 10);
+
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/fail/', formatId: 'best' }),
+    );
+
+    expect(response.status).toBe(502);
+    const json = await response.json();
+    expect(json.code).toBe('DOWNLOAD_FAILED');
+    expect(json.error).toContain('something went wrong');
+  });
+
+  it('maps login-required failures to 429 with a friendly message', async () => {
+    const proc = new MockProcess();
+    mockSpawn.mockReturnValue(proc as never);
+    mockMkdtemp.mockResolvedValue('/tmp/vdl-test');
+    mockRm.mockResolvedValue(undefined);
+
+    setTimeout(() => {
+      proc.stderr.emit(
+        'data',
+        Buffer.from('ERROR: [instagram] abc: login required (use --cookies)\n'),
+      );
+      proc.emit('close', 1);
+    }, 10);
+
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/blocked/', formatId: 'best' }),
+    );
+
+    expect(response.status).toBe(429);
+    const json = await response.json();
+    expect(json.error).toMatch(/blocking anonymous access/);
+  });
+
+  it('returns a clear error when yt-dlp exits 0 without producing a file', async () => {
+    const proc = new MockProcess();
+    mockSpawn.mockReturnValue(proc as never);
+    mockMkdtemp.mockResolvedValue('/tmp/vdl-test');
+    mockReaddir.mockResolvedValue([]);
+    mockRm.mockResolvedValue(undefined);
+
+    setTimeout(() => proc.emit('close', 0), 10);
+
+    const response = await POST(
+      createRequest({ url: 'https://instagram.com/reel/empty/', formatId: 'best' }),
+    );
+
+    expect(response.status).toBe(502);
+    const json = await response.json();
+    expect(json.error).toMatch(/no file was produced/);
+  });
+
+  it('passes the normalized url and a fallback format selector to yt-dlp', async () => {
+    mockSuccessfulDownload();
+
+    await POST(createRequest({ url: 'https://instagram.com/reel/test/', formatId: 'best' }));
+
+    expect(mockSpawn).toHaveBeenCalledWith(
+      'yt-dlp',
+      expect.arrayContaining(['-f', 'b/bestvideo*+bestaudio/best']),
+      expect.any(Object),
+    );
+    const args = mockSpawn.mock.calls[0][1] as string[];
+    expect(args[args.length - 1]).toContain('instagram.com/reel/test');
+  });
+
+  it('tries the requested format id first when it looks like a yt-dlp id', async () => {
+    mockSuccessfulDownload();
+
+    await POST(
+      createRequest({
+        url: 'https://instagram.com/reel/test/',
+        formatId: 'dash-1270852721231081v',
+      }),
+    );
+
+    expect(mockSpawn).toHaveBeenCalledWith(
+      'yt-dlp',
+      expect.arrayContaining([
+        '-f',
+        'dash-1270852721231081v+bestaudio/dash-1270852721231081v/b/bestvideo*+bestaudio/best',
+      ]),
+      expect.any(Object),
+    );
+  });
+
+  it('cleans up the temp dir on failure', async () => {
+    const proc = new MockProcess();
+    mockSpawn.mockReturnValue(proc as never);
+    mockMkdtemp.mockResolvedValue('/tmp/vdl-test');
+    mockRm.mockResolvedValue(undefined);
+
+    setTimeout(() => proc.emit('close', 1), 10);
+
+    await POST(createRequest({ url: 'https://instagram.com/reel/fail/', formatId: 'best' }));
+
+    expect(mockRm).toHaveBeenCalledWith('/tmp/vdl-test', { recursive: true, force: true });
   });
 });

@@ -7,7 +7,7 @@ import React from 'react';
  *
  * The notebook glyph paints with `currentColor` (ink) and the script "A"
  * arc paints with the theme accent token. Use the parent's text color to
- * change ink (`text-[var(--color-ink-900)]` etc.).
+ * change ink (`text-(--color-ink-900)` etc.).
  *
  *   <Logo />            → full lockup (mark + wordmark)
  *   <Logo wordmark={false} /> → just the journal mark

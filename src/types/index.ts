@@ -1,10 +1,10 @@
 // Shared interfaces and types for the Video Downloader application
 
 /** Platform types supported by the application */
-export type Platform = 'instagram' | 'youtube';
+export type Platform = 'instagram';
 
 /** Content types for each platform */
-export type ContentType = 'post' | 'reel' | 'video' | 'short';
+export type ContentType = 'post' | 'reel';
 
 // ─── API Request/Response Interfaces ─────────────────────────────────────────
 
@@ -33,6 +33,7 @@ export interface FetchResponse {
   thumbnail?: string;
   duration: number;
   formats: VideoFormat[];
+  previewVideoUrl?: string;
 }
 
 /** POST /api/download request body */
