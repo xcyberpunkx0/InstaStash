@@ -88,7 +88,7 @@ export function VideoDetails({
         <button
           type="button"
           onClick={() => onDownload(selectedFormat)}
-          className="inline-flex items-center gap-2 px-6 py-[14px] rounded-pill bg-(--color-ink-900) text-(--color-paper-50) font-grotesk font-semibold text-[15px] cursor-pointer border-0 shadow-[0_8px_20px_-10px_rgba(31,27,22,0.45)] hover:translate-y-[-1px] hover:shadow-[0_14px_26px_-10px_rgba(31,27,22,0.5)] active:translate-y-0 transition-[transform,box-shadow] duration-[160ms] ease-(--ease-paper) shrink-0"
+          className="inline-flex items-center gap-2 px-6 py-[14px] rounded-pill bg-(--color-ink-900) text-(--color-paper-50) font-grotesk font-semibold text-[15px] cursor-pointer border-0 shadow-[0_8px_20px_-10px_rgba(31,27,22,0.45)] hover:-translate-y-px hover:shadow-[0_14px_26px_-10px_rgba(31,27,22,0.5)] active:translate-y-0 transition-[transform,box-shadow] duration-160 ease-paper shrink-0"
         >
           Download
           <svg
@@ -130,7 +130,13 @@ export function VideoDetails({
               onError={(e) => {
                 const video = e.currentTarget;
                 const err = video.error;
-                console.error('[VideoPreview] video error:', err?.code, err?.message, 'src:', video.src.substring(0, 80));
+                console.error(
+                  "[VideoPreview] video error:",
+                  err?.code,
+                  err?.message,
+                  "src:",
+                  video.src.substring(0, 80),
+                );
                 setVideoError(true);
               }}
               onLoadedMetadata={(e) => {
@@ -217,7 +223,7 @@ export function VideoDetails({
           <div className="flex items-center gap-2 mb-2">
             <label
               htmlFor="quality-select"
-              className="font-grotesk font-semibold text-[11px] uppercase tracking-[0.14em] text-(--color-ink-400)"
+              className="font-grotesk font-semibold text-[11px] uppercase tracking-[0.14em] text-ink-400"
             >
               Quality
             </label>
@@ -228,7 +234,7 @@ export function VideoDetails({
                 fontFamily: "var(--font-hand)",
                 transform: "rotate(-3deg)",
               }}
-              className="inline-flex items-center gap-1 text-[16px] text-terra-600 whitespace-nowrap pointer-events-none select-none leading-none"
+              className="inline-flex items-center gap-1 text-body text-terra-600 whitespace-nowrap pointer-events-none select-none leading-none"
             >
               <svg
                 className="w-5 h-3"
@@ -258,10 +264,10 @@ export function VideoDetails({
               border border-line-medium outline-none cursor-pointer
               hover:border-terra-500 hover:bg-(--color-paper-200)
               focus:border-terra-500
-              transition-colors duration-[160ms]
+              transition-colors duration-160
               appearance-none
               bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23C97B4E%22 stroke-width=%222.25%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>')]
-              bg-no-repeat bg-[position:right_12px_center]
+              bg-no-repeat bg-position-[right_12px_center]
             "
           >
             {formats.map((f) => (
@@ -275,17 +281,17 @@ export function VideoDetails({
 
       {/* Format chips */}
       <div className="flex flex-wrap gap-2">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-(--color-paper-200) border border-line-soft font-sans text-micro text-(--color-ink-700)">
-          <span className="w-1.5 h-1.5 rounded-full bg-(--color-ink-400)" />
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-(--color-paper-200) border border-line-soft font-sans text-micro text-ink-700">
+          <span className="w-1.5 h-1.5 rounded-full bg-ink-400" />
           {resolution}
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-(--color-paper-200) border border-line-soft font-sans text-micro text-(--color-ink-700)">
-          <span className="w-1.5 h-1.5 rounded-full bg-(--color-ink-400)" />
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-(--color-paper-200) border border-line-soft font-sans text-micro text-ink-700">
+          <span className="w-1.5 h-1.5 rounded-full bg-ink-400" />
           mp4
         </span>
         {sizeMB > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-(--color-paper-200) border border-line-soft font-sans text-micro text-(--color-ink-700)">
-            <span className="w-1.5 h-1.5 rounded-full bg-(--color-ink-400)" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-(--color-paper-200) border border-line-soft font-sans text-micro text-ink-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-ink-400" />
             {sizeMB} MB
           </span>
         )}
