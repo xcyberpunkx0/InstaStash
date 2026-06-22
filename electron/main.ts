@@ -14,10 +14,11 @@ registerMediaScheme();
 
 function createWindow(): void {
   const win = new BrowserWindow({
-    width: 1100,
-    height: 820,
-    minWidth: 880,
-    minHeight: 640,
+    // Always open wider than 1280px, and never let it shrink below that.
+    width: 1360,
+    height: 860,
+    minWidth: 1281,
+    minHeight: 720,
     backgroundColor: '#EFE9E1',
     show: false,
     webPreferences: {
