@@ -10,7 +10,7 @@ export interface CardProps {
 
 /**
  * Paper-textured card with soft shadow and optional hover lift.
- * Follows AuraVault design: paper-50 bg, grain texture, rounded-lg, warm shadow.
+ * Follows InstaStash design: paper-50 bg, grain texture, rounded-lg, warm shadow.
  */
 export function Card({ children, className = '', hover = false }: CardProps) {
   const base = `

@@ -212,7 +212,7 @@ export function Sidebar({ filter, onFilterChange, mobileOpen = false, onMobileCl
 
       {/* Brand + theme picker + close (mobile only) */}
       <div className="flex items-center justify-between gap-2 px-2 pt-1.5 pb-[18px]">
-        <a href="/" className="flex items-center gap-2.5 text-(--color-ink-900)" aria-label="AuraVault home">
+        <a href="/" className="flex items-center gap-2.5 text-(--color-ink-900)" aria-label="InstaStash home">
           <Logo className="h-[30px]" />
         </a>
         <div className="flex items-center gap-1">

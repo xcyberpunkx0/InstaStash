@@ -306,7 +306,7 @@ export default function Home() {
         <a
           href="/"
           className="inline-flex items-center gap-2.5 text-(--color-ink-900)"
-          aria-label="AuraVault"
+          aria-label="InstaStash"
         >
           <Logo className="h-8" />
         </a>

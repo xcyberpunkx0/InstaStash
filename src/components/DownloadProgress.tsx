@@ -11,7 +11,7 @@ export interface DownloadProgressProps {
 }
 
 /**
- * Download progress display following AuraVault design system.
+ * Download progress display following InstaStash design system.
  * Shows progress bar, completion state, or error state.
  */
 export function DownloadProgress({ percentage, status, onRetry }: DownloadProgressProps) {

@@ -11,7 +11,7 @@ export interface StatusPillProps {
 
 /**
  * Small status indicator pill with colored dot.
- * Follows AuraVault design: grotesk font, rounded-pill, colored backgrounds.
+ * Follows InstaStash design: grotesk font, rounded-pill, colored backgrounds.
  */
 export function StatusPill({ variant, children }: StatusPillProps) {
   const styles: Record<StatusPillVariant, { pill: string; dot: string }> = {

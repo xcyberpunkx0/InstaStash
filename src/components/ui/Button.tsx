@@ -8,7 +8,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Pill-shaped button following AuraVault design system.
+ * Pill-shaped button following InstaStash design system.
  * Primary: ink-900 bg, paper-50 text
  * Secondary: transparent bg, ink border
  * Ghost: transparent, terra text

@@ -9,7 +9,7 @@ export interface SketchBorderProps {
 }
 
 /**
- * Simple card wrapper following AuraVault design system.
+ * Simple card wrapper following InstaStash design system.
  * Replaces the old Rough.js-based border with clean CSS.
  */
 export function SketchBorder({ children, className = '' }: SketchBorderProps) {

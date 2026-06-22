@@ -9,9 +9,9 @@
 
 import type { Platform } from '@/types';
 
-const STORAGE_KEY = 'auravault.library.v1';
-const COLLECTIONS_KEY = 'auravault.collections.v1';
-const STORAGE_EVENT = 'auravault:library-changed';
+const STORAGE_KEY = 'instastash.library.v1';
+const COLLECTIONS_KEY = 'instastash.collections.v1';
+const STORAGE_EVENT = 'instastash:library-changed';
 
 export interface LibraryItem {
   id: string;

@@ -27,7 +27,7 @@ export const THEMES: readonly ThemeDefinition[] = [
 ] as const;
 
 export const DEFAULT_THEME_ID = '';
-export const THEME_STORAGE_KEY = 'auravault.theme';
+export const THEME_STORAGE_KEY = 'instastash.theme';
 
 export function applyTheme(id: string): void {
   if (typeof document === 'undefined') return;

@@ -5,7 +5,7 @@
 import rough from 'roughjs';
 import type { Options as RoughOptions } from 'roughjs/bin/core';
 
-/** Theme colors — mapped to AuraVault design system */
+/** Theme colors — mapped to InstaStash design system */
 export const sketchColors = {
   primary: '#C97B4E',     // terra-500
   border: '#C9B89E',      // paper-400

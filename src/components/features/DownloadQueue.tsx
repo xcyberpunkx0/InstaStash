@@ -19,7 +19,7 @@ export interface DownloadQueueItemProps {
 
 /**
  * Single download queue item with thumbnail, progress, status pill, and actions.
- * Matches AuraVault app kit: 120x68 thumbnail, ink title, status pill + progress + size.
+ * Matches InstaStash app kit: 120x68 thumbnail, ink title, status pill + progress + size.
  */
 export function DownloadQueueItem({
   status,

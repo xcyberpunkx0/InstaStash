@@ -3,7 +3,7 @@
 import React from 'react';
 
 /**
- * AuraVault wordmark + mark, theme-aware.
+ * InstaStash wordmark + mark, theme-aware.
  *
  * The notebook glyph paints with `currentColor` (ink) and the script "A"
  * arc paints with the theme accent token. Use the parent's text color to
@@ -14,7 +14,7 @@ import React from 'react';
  */
 
 export interface LogoProps extends React.SVGProps<SVGSVGElement> {
-  /** Show the "AuraVault" wordmark beside the journal mark. Default true. */
+  /** Show the "InstaStash" wordmark beside the journal mark. Default true. */
   wordmark?: boolean;
 }
 
@@ -38,24 +38,24 @@ export function Logo({ wordmark = true, className, ...rest }: LogoProps) {
         />
         {/* Spine seam */}
         <line x1="24" y1="2" x2="24" y2="48" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" />
-        {/* "A" inked on the left page */}
+        {/* "I" inked on the left page */}
         <path
-          d="M11 30 L 16 14 L 21 30 M 12.5 24 L 19.5 24"
+          d="M16 14 L 16 30 M 12.5 14 L 19.5 14 M 12.5 30 L 19.5 30"
           stroke="currentColor"
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* Aura arc + dot — theme accent */}
+        {/* Letter "S" — theme accent */}
         <path
-          d="M28 30 C 28 22, 32 18, 36 18 C 39.5 18, 38 28, 32 30 C 28 31, 27 26, 30 24"
+          d="M36 17 C 35 15, 33 14, 31.5 14 C 29 14, 28 15.5, 28 17.5 C 28 20, 30.5 21, 32 22 C 33.5 23, 36 24, 36 26.5 C 36 28.5, 34.5 30, 32 30 C 30 30, 28.5 29, 28 27"
           stroke="var(--color-terra-500)"
           strokeWidth="2"
           strokeLinecap="round"
           fill="none"
         />
-        <circle cx="36" cy="18" r="1.6" fill="var(--color-terra-500)" />
+        
       </svg>
     );
   }
@@ -66,7 +66,7 @@ export function Logo({ wordmark = true, className, ...rest }: LogoProps) {
       viewBox="0 0 280 64"
       fill="none"
       className={className}
-      aria-label="AuraVault"
+      aria-label="InstaStash"
       role="img"
       {...rest}
     >
@@ -82,7 +82,7 @@ export function Logo({ wordmark = true, className, ...rest }: LogoProps) {
         />
         <line x1="24" y1="2" x2="24" y2="48" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" />
         <path
-          d="M11 30 L 16 14 L 21 30 M 12.5 24 L 19.5 24"
+          d="M16 14 L 16 30 M 12.5 14 L 19.5 14 M 12.5 30 L 19.5 30"
           stroke="currentColor"
           strokeWidth="1.6"
           strokeLinecap="round"
@@ -90,13 +90,13 @@ export function Logo({ wordmark = true, className, ...rest }: LogoProps) {
           fill="none"
         />
         <path
-          d="M28 30 C 28 22, 32 18, 36 18 C 39.5 18, 38 28, 32 30 C 28 31, 27 26, 30 24"
+          d="M36 17 C 35 15, 33 14, 31.5 14 C 29 14, 28 15.5, 28 17.5 C 28 20, 30.5 21, 32 22 C 33.5 23, 36 24, 36 26.5 C 36 28.5, 34.5 30, 32 30 C 30 30, 28.5 29, 28 27"
           stroke="var(--color-terra-500)"
           strokeWidth="1.8"
           strokeLinecap="round"
           fill="none"
         />
-        <circle cx="36" cy="18" r="1.4" fill="var(--color-terra-500)" />
+        
       </g>
 
       <g transform="translate(60 0)">
@@ -110,7 +110,7 @@ export function Logo({ wordmark = true, className, ...rest }: LogoProps) {
           fill="currentColor"
           letterSpacing="-0.5"
         >
-          AuraVault
+          InstaStash
         </text>
         {/* Sketch underline — theme accent */}
         <path

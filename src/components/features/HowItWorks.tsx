@@ -24,7 +24,7 @@ const steps = [
 
 /**
  * "How it works" section with numbered steps.
- * Follows AuraVault design: display font numbers, hand-drawn arrow connections.
+ * Follows InstaStash design: display font numbers, hand-drawn arrow connections.
  */
 export function HowItWorks() {
   return (

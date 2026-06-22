@@ -56,7 +56,7 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AuraVault — Save the internet, beautifully.',
+  title: 'InstaStash — Save the internet, beautifully.',
   description:
     'Download videos from YouTube, Instagram, TikTok and seventy more — fast, open-source, and blessedly distraction-free.',
 };
@@ -76,7 +76,7 @@ export default function RootLayout({
         {/* Apply persisted theme before paint so there's no flash of the default. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('auravault.theme');if(t){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('instastash.theme');if(t){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
           }}
         />
       </head>

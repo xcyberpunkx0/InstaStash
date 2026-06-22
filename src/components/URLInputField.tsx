@@ -24,7 +24,7 @@ const platformLabels: Record<string, string> = {
 };
 
 /**
- * URL input field following AuraVault design system.
+ * URL input field following InstaStash design system.
  * Pill-shaped input with paste handling, loading state, and platform badge.
  */
 export function URLInputField({

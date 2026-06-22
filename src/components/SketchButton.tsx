@@ -7,7 +7,7 @@ export interface SketchButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 /**
- * Button component following AuraVault design system.
+ * Button component following InstaStash design system.
  * Pill-shaped with warm shadows and subtle hover lift.
  * Replaces the old Rough.js-based button.
  */

@@ -51,7 +51,7 @@ const defaultPlatforms: PlatformExample[] = [
 ];
 
 /**
- * Help section with platform instructions following AuraVault design system.
+ * Help section with platform instructions following InstaStash design system.
  */
 export function HelpSection({
   platforms = defaultPlatforms,

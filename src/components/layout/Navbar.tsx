@@ -7,7 +7,7 @@ export function Navbar() {
     <header className="max-w-[1280px] mx-auto px-6 md:px-12">
       <nav className="flex items-center justify-between py-[22px]">
         <a href="/" className="block">
-          <img src="/assets/logo.svg" alt="AuraVault" className="h-9" />
+          <img src="/assets/logo.svg" alt="InstaStash" className="h-9" />
         </a>
 
         <div className="hidden md:flex items-center gap-7">

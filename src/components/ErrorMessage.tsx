@@ -47,7 +47,7 @@ export function getErrorMessage(type: ErrorMessageProps['type'], countdown?: num
 }
 
 /**
- * Error display component following AuraVault design system.
+ * Error display component following InstaStash design system.
  */
 export function ErrorMessage({
   type,

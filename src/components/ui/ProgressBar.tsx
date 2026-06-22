@@ -13,7 +13,7 @@ export interface ProgressBarProps {
 
 /**
  * Rounded progress bar with terra/sage gradient fill.
- * Follows AuraVault design: paper-300 track, terra gradient fill, pill shape.
+ * Follows InstaStash design: paper-300 track, terra gradient fill, pill shape.
  */
 export function ProgressBar({ value, variant = 'terra', label }: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, Math.round(value)));

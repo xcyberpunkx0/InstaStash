@@ -7,7 +7,7 @@ import { animationDurations } from '../rough-utils';
  *
  * For any micro-animation defined on interactive elements,
  * the animation duration SHALL be between 100ms and 500ms inclusive.
- * (Updated to match AuraVault design system: 140ms / 240ms / 420ms)
+ * (Updated to match InstaStash design system: 140ms / 240ms / 420ms)
  */
 describe('Feature: video-downloader-site, Property 9: Animation Duration Bounds', () => {
   it('all animation durations are between 100ms and 500ms inclusive', () => {

@@ -27,7 +27,7 @@ function sortByResolutionDesc(options: VideoQuality[]): VideoQuality[] {
 }
 
 /**
- * Quality selection component following AuraVault design system.
+ * Quality selection component following InstaStash design system.
  * Pill-shaped radio buttons sorted from highest to lowest resolution.
  */
 export function QualitySelector({ options, onSelect, selectedId }: QualitySelectorProps) {

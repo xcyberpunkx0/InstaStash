@@ -23,7 +23,7 @@ function getPlatformName(platform: PlatformIndicatorProps["platform"]): string {
 }
 
 /**
- * Platform badge indicator following AuraVault design system.
+ * Platform badge indicator following InstaStash design system.
  * Clean pill-shaped badge with platform icon and label.
  */
 export function PlatformIndicator({

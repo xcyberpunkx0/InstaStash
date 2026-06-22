@@ -11,7 +11,7 @@ import {
 describe('rough-utils', () => {
   describe('sketchColors', () => {
     it('defines the correct theme colors', () => {
-      // Updated to match AuraVault design system
+      // Updated to match InstaStash design system
       expect(sketchColors.primary).toBe('#C97B4E');     // terra-500
       expect(sketchColors.border).toBe('#C9B89E');      // paper-400
       expect(sketchColors.text).toBe('#1F1B16');        // ink-900
@@ -33,7 +33,7 @@ describe('rough-utils', () => {
     });
 
     it('has correct specific values', () => {
-      // Updated to match AuraVault design system: 140 / 240 / 420
+      // Updated to match InstaStash design system: 140 / 240 / 420
       expect(animationDurations.micro).toBe(140);
       expect(animationDurations.standard).toBe(240);
       expect(animationDurations.slow).toBe(420);

@@ -19,7 +19,7 @@ export function Footer() {
       <div className="flex justify-between items-start gap-10 flex-wrap">
         {/* Brand */}
         <div className="flex-1 min-w-[240px]">
-          <img src="/assets/logo.svg" alt="AuraVault" className="h-8" />
+          <img src="/assets/logo.svg" alt="InstaStash" className="h-8" />
           <p className="text-(--color-ink-500) text-small max-w-[38ch] mt-3">
             A quieter way to keep the internet. Made with care in a small studio, somewhere with good coffee.
           </p>

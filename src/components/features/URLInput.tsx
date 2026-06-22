@@ -13,7 +13,7 @@ export interface URLInputProps {
 }
 
 /**
- * AuraVault URL input — pill-shaped with JetBrains Mono text.
+ * InstaStash URL input — pill-shaped with JetBrains Mono text.
  * Matches the design system: link icon, mono URL text, paste + Download buttons.
  * Placeholder: "paste a link, any link..."
  */
