@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import type { VideoFormat } from "@/types";
+import { mediaUrl } from "@/lib/desktop-client";
 
 export interface VideoDetailsProps {
   title: string;
@@ -41,14 +42,11 @@ export function VideoDetails({
     : 0;
   const directUrl = selectedOption?.directUrl;
   const rawPreviewUrl = previewVideoUrl ?? directUrl;
-  // Proxy through our server to bypass Instagram CDN CORS blocks
-  const previewUrl = rawPreviewUrl
-    ? `/api/proxy-video?url=${encodeURIComponent(rawPreviewUrl)}`
-    : undefined;
+  // Route through the main process (instastash-media://) to bypass Instagram
+  // CDN CORS/referer blocks — replaces the old /api/proxy-video route.
+  const previewUrl = rawPreviewUrl ? mediaUrl(rawPreviewUrl) : undefined;
 
-  const proxiedThumbnail = thumbnail
-    ? `/api/proxy-image?url=${encodeURIComponent(thumbnail)}`
-    : undefined;
+  const proxiedThumbnail = thumbnail ? mediaUrl(thumbnail) : undefined;
 
   useEffect(() => {
     if (imgRef.current) {

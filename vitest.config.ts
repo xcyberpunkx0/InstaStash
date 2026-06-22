@@ -13,5 +13,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    // Never test build artifacts (the standalone bundle copies src/ into .next/).
+    exclude: ['**/node_modules/**', '**/.next/**', '**/dist/**'],
   },
 });

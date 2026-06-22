@@ -18,6 +18,11 @@
 # production
 /build
 
+# electron
+/dist-electron/
+/release/
+/resources/bin/
+
 # misc
 .DS_Store
 *.pem

@@ -1,16 +1,22 @@
 {
-  "name": "video-downloader-site",
+  "name": "instastash",
   "version": "0.1.0",
   "private": true,
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:electron": "node scripts/build-electron.mjs",
+    "dev:desktop": "concurrently -k -n NEXT,ESBUILD,ELECTRON \"next dev\" \"node scripts/build-electron.mjs --watch\" \"wait-on tcp:3000 dist-electron/main.js && cross-env ELECTRON_DEV=1 electron .\"",
+    "fetch-binaries": "node scripts/fetch-binaries.mjs",
+    "dist": "npm run fetch-binaries && npm run build && npm run build:electron && electron-builder"
   },
   "dependencies": {
+    "ffmpeg-static": "^5.2.0",
     "motion": "^12.40.0",
     "next": "^16.2.6",
     "react": "^19.1.0",
@@ -27,11 +33,50 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.4.0",
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.24.0",
     "fast-check": "^4.0.0",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.instastash.app",
+    "productName": "InstaStash",
+    "files": [
+      "dist-electron/**/*",
+      "out/**/*"
+    ],
+    "asarUnpack": [
+      "**/node_modules/ffmpeg-static/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "extraResources": [
+        {
+          "from": "resources/bin/win32",
+          "to": "bin"
+        }
+      ]
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities",
+      "extraResources": [
+        {
+          "from": "resources/bin/darwin",
+          "to": "bin"
+        }
+      ]
+    },
+    "directories": {
+      "output": "release"
+    }
   }
 }

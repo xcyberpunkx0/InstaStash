@@ -24,11 +24,12 @@ import {
 } from "@/components/ui/SketchMarks";
 import { useRetryState } from "@/hooks/useRetryState";
 import { libraryStore } from "@/lib/library-store";
-import { smartDownload } from "@/lib/downloader-client";
+import { bridge, isDesktop } from "@/lib/desktop-client";
 import type {
   AppState,
   DetectResponse,
   FetchResponse,
+  VideoFormat,
   VideoQuality,
 } from "@/types";
 import type { DetectErrorResponse, FetchErrorResponse } from "@/types/errors";
@@ -130,7 +131,15 @@ const CAVEAT_STYLE: React.CSSProperties = {
 
 export default function Home() {
   const [state, dispatch] = useReducer(appReducer, initialState);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  // Tracks the in-flight download job so progress/done/error events can be
+  // matched to it, plus the context needed to write the library entry on done.
+  const activeJobIdRef = useRef<string | null>(null);
+  const downloadCtxRef = useRef<{
+    meta?: FetchResponse;
+    fmt?: VideoFormat;
+    platform: string;
+    url: string;
+  } | null>(null);
   const retryState = useRetryState();
   const [selectedFormatId, setSelectedFormatId] = useState<string | null>(null);
 
@@ -156,40 +165,37 @@ export default function Home() {
   const handleDetect = useCallback(async (url: string) => {
     dispatch({ type: "SET_URL", url });
     dispatch({ type: "DETECT_START" });
-    try {
-      const response = await fetch("/api/detect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+    if (!isDesktop()) {
+      dispatch({
+        type: "DETECT_ERROR",
+        error: {
+          error: "Please open InstaStash from the desktop app.",
+          code: "TIMEOUT",
+          supportedPlatforms: ["Instagram"],
+        },
       });
-      const data = await response.json();
-      if (!response.ok) {
-        dispatch({ type: "DETECT_ERROR", error: data as DetectErrorResponse });
+      return;
+    }
+    try {
+      const detected = await bridge().detect(url);
+      if (!detected.ok) {
+        dispatch({ type: "DETECT_ERROR", error: detected.error });
         return;
       }
-      const result = data as DetectResponse;
-      dispatch({ type: "DETECT_SUCCESS", result });
+      dispatch({ type: "DETECT_SUCCESS", result: detected.data });
       // Auto-fetch metadata after detection
       dispatch({ type: "FETCH_START" });
-      const fetchResp = await fetch("/api/fetch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, platform: result.platform }),
-      });
-      const fetchData = await fetchResp.json();
-      if (!fetchResp.ok) {
-        dispatch({
-          type: "FETCH_ERROR",
-          error: fetchData as FetchErrorResponse,
-        });
+      const fetched = await bridge().fetchMetadata(url);
+      if (!fetched.ok) {
+        dispatch({ type: "FETCH_ERROR", error: fetched.error });
         return;
       }
-      dispatch({ type: "FETCH_SUCCESS", metadata: fetchData as FetchResponse });
+      dispatch({ type: "FETCH_SUCCESS", metadata: fetched.data });
     } catch {
       dispatch({
         type: "DETECT_ERROR",
         error: {
-          error: "Couldn't connect — check your internet and try again.",
+          error: "Something went wrong — please try again.",
           code: "TIMEOUT",
           supportedPlatforms: ["Instagram"],
         },
@@ -200,13 +206,63 @@ export default function Home() {
   // Keep the autostart ref pointed at the latest handler.
   handleDetectRef.current = handleDetect;
 
+  // Subscribe once to the main-process download events and route them into the
+  // reducer. Events are matched to the active job via activeJobIdRef.
+  useEffect(() => {
+    if (!isDesktop()) return;
+    const api = bridge();
+    const offProgress = api.onProgress((e) => {
+      if (e.jobId !== activeJobIdRef.current) return;
+      dispatch({ type: "DOWNLOAD_PROGRESS", percentage: e.pct });
+    });
+    const offDone = api.onDone((e) => {
+      if (e.jobId !== activeJobIdRef.current) return;
+      const filename = e.filePath.split(/[\\/]/).pop() ?? "video.mp4";
+      dispatch({ type: "DOWNLOAD_COMPLETE", filename });
+      const ctx = downloadCtxRef.current;
+      try {
+        libraryStore.add({
+          url: ctx?.url ?? "",
+          title: ctx?.meta?.title ?? filename,
+          platform: ctx?.platform ?? "instagram",
+          thumbnail: ctx?.meta?.thumbnail,
+          duration: ctx?.meta?.duration,
+          fileSize: ctx?.fmt?.fileSize || e.bytes,
+          resolution: ctx?.fmt?.resolution,
+          format: ctx?.fmt?.ext,
+          filename,
+        });
+      } catch {
+        /* swallow — library write is non-critical */
+      }
+      activeJobIdRef.current = null;
+    });
+    const offError = api.onError((e) => {
+      if (e.jobId !== activeJobIdRef.current) return;
+      dispatch({ type: "DOWNLOAD_ERROR", error: e.message });
+      activeJobIdRef.current = null;
+    });
+    return () => {
+      offProgress();
+      offDone();
+      offError();
+    };
+  }, []);
+
   const handleDownload = useCallback(
     async (formatId: string) => {
       setSelectedFormatId(formatId);
       dispatch({ type: "DOWNLOAD_START" });
-      if (abortControllerRef.current) abortControllerRef.current.abort();
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
+      if (!isDesktop()) {
+        dispatch({
+          type: "DOWNLOAD_ERROR",
+          error: "Please open InstaStash from the desktop app.",
+        });
+        return;
+      }
+
+      // Cancel any previous in-flight job before starting a new one.
+      if (activeJobIdRef.current) bridge().cancel(activeJobIdRef.current);
 
       const meta =
         state.fetch.status === "fetched" ? state.fetch.metadata : undefined;
@@ -215,41 +271,19 @@ export default function Home() {
       const platform =
         state.detection.status === "detected"
           ? state.detection.result.platform
-          : "unknown";
+          : "instagram";
+      downloadCtxRef.current = { meta, fmt, platform, url: state.url };
 
       try {
-        const result = await smartDownload(
-          {
-            srcUrl: state.url,
-            formatId,
-            directUrl: fmt?.directUrl,
-            hasAudio: fmt?.hasAudio,
-            ext: fmt?.ext,
-          },
-          (pct) => dispatch({ type: "DOWNLOAD_PROGRESS", percentage: pct }),
-          controller.signal,
-        );
-
-        dispatch({ type: "DOWNLOAD_COMPLETE", filename: result.filename });
-
-        // Save to library — best-effort, never block the UI
-        try {
-          libraryStore.add({
-            url: state.url,
-            title: meta?.title ?? result.filename ?? "Untitled",
-            platform,
-            thumbnail: meta?.thumbnail,
-            duration: meta?.duration,
-            fileSize: fmt?.fileSize || result.bytes,
-            resolution: fmt?.resolution,
-            format: fmt?.ext,
-            filename: result.filename,
-          });
-        } catch {
-          /* swallow — library write is non-critical */
-        }
+        const jobId = await bridge().download({
+          url: state.url,
+          formatId,
+          directUrl: fmt?.directUrl,
+          hasAudio: fmt?.hasAudio,
+          ext: fmt?.ext,
+        });
+        activeJobIdRef.current = jobId;
       } catch (err: unknown) {
-        if (err instanceof DOMException && err.name === "AbortError") return;
         const message =
           err instanceof Error
             ? err.message
