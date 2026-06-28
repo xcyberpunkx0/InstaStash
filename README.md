@@ -11,8 +11,7 @@ No ads, no pop-ups, no sign-up, no shady websites.
 ![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20macOS-blue)
 ![License](https://img.shields.io/badge/use-personal-green)
 
-<!-- This image shows once you add docs/demo.gif -->
-<img src="docs/demo.gif" alt="InstaStash in action" width="720" />
+<img src="docs/demo.gif" alt="InstaStash in action — paste a link, pick a quality, and the video saves to your computer" width="720" />
 
 </div>
 
