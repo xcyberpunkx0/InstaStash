@@ -1,10 +1,10 @@
 // Shared interfaces and types for the Video Downloader application
 
 /** Platform types supported by the application */
-export type Platform = 'instagram';
+export type Platform = 'instagram' | 'youtube';
 
 /** Content types for each platform */
-export type ContentType = 'post' | 'reel';
+export type ContentType = 'post' | 'reel' | 'video';
 
 // ─── API Request/Response Interfaces ─────────────────────────────────────────
 
@@ -100,7 +100,7 @@ export type FetchState =
 /** State machine for video download */
 export type DownloadState =
   | { status: 'idle' }
-  | { status: 'downloading'; percentage: number }
+  | { status: 'downloading'; percentage: number; eta?: string }
   | { status: 'complete'; filename: string }
   | { status: 'error'; error: string; retryCount: number };
 

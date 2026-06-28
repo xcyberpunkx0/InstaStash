@@ -196,7 +196,7 @@ export function VideoDetails({
             <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
           </svg>
           <span className="text-[13px] text-ink-300">
-            Preview not available (Instagram CDN expired)
+            Preview not available
           </span>
         </div>
       )}

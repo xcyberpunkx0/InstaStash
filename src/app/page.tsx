@@ -347,6 +347,29 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <ThemePicker align="top-left" />
           <a
+            href="/youtube"
+            className="
+              inline-flex items-center gap-2
+              px-4 py-2 rounded-pill
+              bg-(--color-ink-900) border border-(--color-ink-900)
+              text-(--color-paper-50) no-underline
+              font-grotesk font-medium text-[13px]
+              hover:-translate-y-px hover:shadow-[0_10px_22px_-10px_rgba(31,27,22,0.45)]
+              transition-[transform,box-shadow] duration-160
+            "
+            aria-label="Open the YouTube downloader"
+          >
+            <svg
+              className="w-4 h-4 text-rouge-500"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6Z" />
+            </svg>
+            YouTube downloader
+          </a>
+          <a
             href="/library"
             className="
               inline-flex items-center gap-2

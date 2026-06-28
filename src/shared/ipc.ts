@@ -48,6 +48,8 @@ export interface ProgressEvent {
   pct: number;
   /** 'downloading' | 'merging' | 'starting'. */
   stage: string;
+  /** Human-readable time remaining from yt-dlp, e.g. "00:42". Absent when unknown. */
+  eta?: string;
 }
 
 export interface DoneEvent {

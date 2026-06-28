@@ -38,12 +38,12 @@ function classifyFailure(stderrTail: string, exitCode: number | null): { message
     .trim();
   const haystack = `${errorLine ?? ''} ${stderrTail}`.toLowerCase();
 
-  if (/login required|requested content is not available|rate-?limit/.test(haystack))
-    return { message: 'Instagram is blocking access right now. Try again in a few minutes.', code: 'RATE_LIMITED' };
+  if (/login required|requested content is not available|rate-?limit|sign in to confirm/.test(haystack))
+    return { message: 'The platform is blocking access right now. Try again in a few minutes.', code: 'RATE_LIMITED' };
   if (/private/.test(haystack))
     return { message: "This video is private and can't be downloaded.", code: 'PRIVATE' };
   if (/unsupported url|not a valid url/.test(haystack))
-    return { message: "This URL isn't a downloadable Instagram video.", code: 'INVALID' };
+    return { message: "This URL isn't a downloadable video.", code: 'INVALID' };
   if (/max-filesize/.test(haystack))
     return { message: `This video exceeds the ${MAX_FILESIZE} download limit.`, code: 'TOO_LARGE' };
   if (/requested format is not available/.test(haystack))
@@ -55,15 +55,40 @@ function classifyFailure(stderrTail: string, exitCode: number | null): { message
 /** Pull a 0–100 percentage out of a yt-dlp --newline progress line. */
 function parsePct(line: string): number | null {
   const m = line.match(/\[download\]\s+([\d.]+)%/);
-  return m ? Math.min(99, Math.floor(parseFloat(m[1]))) : null;
+  return m ? Math.min(100, Math.floor(parseFloat(m[1]))) : null;
 }
 
-/** Find the produced file (largest non-temp file in the dir). */
-async function findProducedFile(dir: string): Promise<string | null> {
+/** Pull the ETA (e.g. "00:42") out of a yt-dlp progress line, if present. */
+function parseEta(line: string): string | undefined {
+  const m = line.match(/ETA\s+(\d+:\d+(?::\d+)?)/);
+  return m ? m[1] : undefined;
+}
+
+/**
+ * Map a single stream's 0–100% onto the overall bar. YouTube pulls the video
+ * stream first (the bulk), then a small audio stream, then merges — so we give
+ * the first stream most of the bar and reserve headroom for the rest. This
+ * keeps the bar moving through audio + merge instead of parking at 99%.
+ */
+function overallPct(segIndex: number, streamPct: number): number {
+  if (segIndex <= 0) return (streamPct / 100) * 88; // stream 1 (video): 0–88
+  if (segIndex === 1) return 88 + (streamPct / 100) * 8; // stream 2 (audio): 88–96
+  return 96 + (streamPct / 100) * 2; // any extra stream: 96–98
+}
+
+/**
+ * Find the file we just produced. We told yt-dlp to write "<stem>.<ext>" (the
+ * platform video id), so match by that exact prefix instead of "largest file in
+ * the folder" — otherwise an unrelated, bigger file already sitting in the
+ * downloads directory could be reported as the result.
+ */
+async function findProducedFile(dir: string, stem: string): Promise<string | null> {
   const entries = (await readdir(dir)).filter((n) => !n.endsWith('.part') && !n.endsWith('.ytdl'));
-  if (entries.length === 0) return null;
+  const ours = entries.filter((n) => n.startsWith(`${stem}.`));
+  if (ours.length === 0) return null;
+  // If both a leftover stream and the final mux exist, the largest is the video.
   const sized = await Promise.all(
-    entries.map(async (name) => ({ p: path.join(dir, name), size: (await stat(path.join(dir, name))).size })),
+    ours.map(async (name) => ({ p: path.join(dir, name), size: (await stat(path.join(dir, name))).size })),
   );
   sized.sort((a, b) => b.size - a.size);
   return sized[0].p;
@@ -80,7 +105,7 @@ export async function startDownload(wc: WebContents, input: DownloadInput): Prom
   const detection = platformDetector.detect(input.url);
   if (!isDetectSuccess(detection)) {
     queueMicrotask(() =>
-      wc.send(Channels.error, { jobId, message: 'Only Instagram post/reel URLs are supported.', code: 'INVALID' }),
+      wc.send(Channels.error, { jobId, message: 'Only Instagram and YouTube video URLs are supported.', code: 'INVALID' }),
     );
     return jobId;
   }
@@ -109,6 +134,13 @@ export async function startDownload(wc: WebContents, input: DownloadInput): Prom
   let stderrTail = '';
   let settled = false;
   let stallTimer: ReturnType<typeof setTimeout> | null = null;
+  // Progress tracking. yt-dlp reports a fresh 0–100% for each stream it pulls
+  // (video, then audio). We band each stream onto a slice of the overall bar
+  // (see overallPct) and clamp to a monotonic value, so the bar always moves
+  // forward and keeps climbing through the audio stream + merge.
+  let maxPct = 0;
+  // Number of streams started so far, detected via "[download] Destination:".
+  let segIndex = -1;
 
   const cleanup = () => {
     clearTimeout(hardTimer);
@@ -134,9 +166,23 @@ export async function startDownload(wc: WebContents, input: DownloadInput): Prom
   proc.stdout?.on('data', (chunk: Buffer) => {
     resetStall();
     for (const line of chunk.toString().split('\n')) {
-      const pct = parsePct(line);
-      if (pct !== null) wc.send(Channels.progress, { jobId, pct, stage: 'downloading' });
-      else if (line.includes('[Merger]')) wc.send(Channels.progress, { jobId, pct: 99, stage: 'merging' });
+      // A new stream is starting — advance to the next band of the overall bar.
+      if (line.includes('[download] Destination:')) {
+        segIndex += 1;
+        continue;
+      }
+      const streamPct = parsePct(line);
+      if (streamPct !== null) {
+        const pct = Math.min(98, Math.round(overallPct(Math.max(0, segIndex), streamPct)));
+        // Only move forward — ignore jitter and the reset at each new stream.
+        if (pct > maxPct) {
+          maxPct = pct;
+          wc.send(Channels.progress, { jobId, pct: maxPct, stage: 'downloading', eta: parseEta(line) });
+        }
+      } else if (line.includes('[Merger]')) {
+        maxPct = Math.max(maxPct, 99);
+        wc.send(Channels.progress, { jobId, pct: 99, stage: 'merging' });
+      }
     }
   });
 
@@ -154,7 +200,7 @@ export async function startDownload(wc: WebContents, input: DownloadInput): Prom
       return fail(message, errCode);
     }
     try {
-      const filePath = await findProducedFile(downloadDir);
+      const filePath = await findProducedFile(downloadDir, detection.videoId);
       if (!filePath) return fail('Download finished but no file was produced.', 'NO_FILE');
       const { size } = await stat(filePath);
       settled = true;

@@ -8,7 +8,7 @@ import { getSettings, setSettings } from '../settings';
 import { startDownload, cancelDownload } from './download';
 import { Channels, type DetectResult, type FetchResult, type DownloadInput, type Settings } from '@/shared/ipc';
 
-const SUPPORTED = ['instagram.com/p/…', 'instagram.com/reel/…'];
+const SUPPORTED = ['instagram.com/reel/…', 'youtube.com/watch?v=…', 'youtu.be/…'];
 
 export function registerIpc(win: BrowserWindow): void {
   ipcMain.handle(Channels.detect, async (_e, url: string): Promise<DetectResult> => {
@@ -27,7 +27,7 @@ export function registerIpc(win: BrowserWindow): void {
     return {
       ok: false,
       error: {
-        error: 'Only Instagram post and reel URLs are supported.',
+        error: 'Only Instagram and YouTube video URLs are supported.',
         code: 'UNSUPPORTED_PLATFORM',
         supportedPlatforms: SUPPORTED,
       },
@@ -41,7 +41,7 @@ export function registerIpc(win: BrowserWindow): void {
       return { ok: false, error: { error: 'Unsupported URL.', code: 'NETWORK_ERROR' } };
     }
     try {
-      const meta = await new VideoFetcher().fetchMetadata(detection.normalizedUrl, 'instagram');
+      const meta = await new VideoFetcher().fetchMetadata(detection.normalizedUrl, detection.platform);
       return { ok: true, data: meta };
     } catch (err) {
       if (err instanceof VideoFetchError) {

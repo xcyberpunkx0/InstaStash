@@ -10,6 +10,15 @@ export type DetectError = DetectErrorResponse;
 /** Tracking parameters to strip from URLs */
 const TRACKING_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'igshid', 'si', 'feature'];
 
+/** Platforms we tell the user we support, in error responses. */
+const SUPPORTED_PLATFORMS = ['Instagram', 'YouTube'];
+
+/** Example URL formats shown when a URL isn't recognized. */
+const EXAMPLE_FORMATS = [
+  'https://www.instagram.com/reel/ABC123/',
+  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+];
+
 export class PlatformDetector {
   /**
    * Detects the platform, content type, and video ID from a URL.
@@ -21,7 +30,7 @@ export class PlatformDetector {
       return {
         error: 'Please paste a video URL to get started!',
         code: 'EMPTY_URL' as DetectErrorCode,
-        supportedPlatforms: ['Instagram'],
+        supportedPlatforms: SUPPORTED_PLATFORMS,
       };
     }
 
@@ -51,29 +60,43 @@ export class PlatformDetector {
       };
     }
 
+    // Try YouTube patterns (watch, shorts, embed, youtu.be)
+    const youtubeId = this.matchYouTubeId(normalizedUrl);
+    if (youtubeId) {
+      return {
+        platform: 'youtube',
+        contentType: 'video',
+        videoId: youtubeId,
+        normalizedUrl,
+      };
+    }
+
     // Check if it's a supported domain but invalid path
     if (this.isSupportedDomain(normalizedUrl)) {
       return {
         error: "This doesn't look like a video link. Check the URL?",
         code: 'INVALID_FORMAT' as DetectErrorCode,
-        supportedPlatforms: ['Instagram'],
-        exampleFormats: [
-          'https://www.instagram.com/p/ABC123/',
-          'https://www.instagram.com/reel/ABC123/',
-        ],
+        supportedPlatforms: SUPPORTED_PLATFORMS,
+        exampleFormats: EXAMPLE_FORMATS,
       };
     }
 
     // Unsupported platform
     return {
-      error: "We don't recognize this URL. We support Instagram!",
+      error: "We don't recognize this URL. We support Instagram and YouTube!",
       code: 'UNSUPPORTED_PLATFORM' as DetectErrorCode,
-      supportedPlatforms: ['Instagram'],
-      exampleFormats: [
-        'https://www.instagram.com/p/ABC123/',
-        'https://www.instagram.com/reel/ABC123/',
-      ],
+      supportedPlatforms: SUPPORTED_PLATFORMS,
+      exampleFormats: EXAMPLE_FORMATS,
     };
+  }
+
+  /** Try each YouTube URL shape and return the 11-char video id, or null. */
+  private matchYouTubeId(normalizedUrl: string): string | null {
+    for (const pattern of Object.values(URL_PATTERNS.youtube)) {
+      const match = pattern.exec(normalizedUrl);
+      if (match) return match[1];
+    }
+    return null;
   }
 
   /**
@@ -140,6 +163,10 @@ export class PlatformDetector {
       if (reelMatch) return reelMatch[2];
 
       return null;
+    }
+
+    if (platform === 'youtube') {
+      return this.matchYouTubeId(normalizedUrl);
     }
 
     return null;

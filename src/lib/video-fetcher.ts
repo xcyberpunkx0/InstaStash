@@ -183,6 +183,52 @@ function mapInstagramFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
   ];
 }
 
+/**
+ * Map YouTube's many raw formats into one VideoFormat per standard resolution.
+ *
+ * YouTube serves high resolutions as video-only DASH streams, so we pick the
+ * best representative format at each height (preferring mp4/H.264 for broad
+ * compatibility). Audio is merged at download time via `<formatId>+bestaudio`,
+ * so `hasAudio` is left false here — these are selection hints, not direct URLs.
+ */
+function mapYouTubeFormats(rawFormats: YtDlpFormat[]): VideoFormat[] {
+  // Score a format for "preferred representative at its height".
+  const score = (f: YtDlpFormat): number => {
+    const vcodec = (f.vcodec ?? '').toLowerCase();
+    const acodec = (f.acodec ?? '').toLowerCase();
+    const ext = (f.ext ?? '').toLowerCase();
+    let s = 0;
+    if (ext === 'mp4') s += 3;
+    if (vcodec.includes('avc') || vcodec.includes('h264')) s += 3;
+    if (acodec && acodec !== 'none') s += 1; // muxed = convenient, no merge needed
+    return s;
+  };
+
+  const byHeight = new Map<number, YtDlpFormat>();
+  for (const format of rawFormats) {
+    const vcodec = (format.vcodec ?? '').toLowerCase();
+    if (!vcodec || vcodec === 'none') continue; // need a video stream
+    const height = parseResolutionHeight(format);
+    if (height <= 0) continue;
+    const existing = byHeight.get(height);
+    if (!existing || score(format) > score(existing)) byHeight.set(height, format);
+  }
+
+  const heights = [...byHeight.keys()].sort((a, b) => b - a);
+  return heights.map((height) => {
+    const best = byHeight.get(height)!;
+    const fileSize = best.filesize ?? best.filesize_approx ?? 0;
+    return {
+      formatId: best.format_id,
+      resolution: buildResolutionLabel(height),
+      fileSize,
+      ext: 'mp4',
+      quality: fileSize > 0 ? buildQualityLabel(height, fileSize) : buildResolutionLabel(height),
+      hasAudio: false,
+    };
+  });
+}
+
 /** Find a playable progressive URL from raw formats */
 function findPreviewUrl(rawFormats: YtDlpFormat[]): string | undefined {
   // Look for format with format_id === '1' first (Instagram progressive format)
@@ -225,6 +271,9 @@ export class VideoFetcher {
    * Throws VideoFetchError with typed error codes on failure.
    */
   async fetchMetadata(url: string, platform: Platform): Promise<VideoMetadata> {
+    if (platform === 'youtube') {
+      return this.fetchYouTubeMetadata(url);
+    }
     if (platform !== 'instagram') {
       throw new VideoFetchError('Unsupported platform', 'NETWORK_ERROR');
     }
@@ -282,6 +331,41 @@ export class VideoFetcher {
       thumbnail: output.thumbnail ?? '',
       formats,
       previewVideoUrl: findPreviewUrl(output.formats),
+    };
+  }
+
+  /**
+   * Fetch YouTube metadata via yt-dlp and expose one option per resolution.
+   * No CDN scraping — YouTube formats come straight from --dump-json.
+   */
+  private async fetchYouTubeMetadata(url: string): Promise<VideoMetadata> {
+    let output: YtDlpOutput;
+    try {
+      output = await this.executeYtDlp(url);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const stderr = (error as { stderr?: string })?.stderr ?? '';
+      const mapped = mapYtDlpError(`${errorMessage} ${stderr}`);
+      throw new VideoFetchError(mapped.message, mapped.code, mapped.retryAfter);
+    }
+
+    if (output.duration > MAX_DURATION_SECONDS) {
+      throw new VideoFetchError(
+        'This video is too long! We support videos up to 60 minutes.',
+        'DURATION_EXCEEDED',
+      );
+    }
+
+    const formats = mapYouTubeFormats(output.formats);
+
+    return {
+      title: output.title,
+      duration: output.duration,
+      thumbnail: output.thumbnail ?? '',
+      // Always offer at least a "best available" option so the UI can download.
+      formats: formats.length
+        ? formats
+        : [{ formatId: 'best', resolution: 'best', fileSize: 0, ext: 'mp4', quality: 'Best available', hasAudio: false }],
     };
   }
 
