@@ -7,7 +7,7 @@ import { registerMediaScheme, handleMediaProtocol } from './media-protocol';
 import { registerIpc } from './ipc/register';
 
 const isDev = !!process.env.ELECTRON_DEV;
-const DEV_URL = 'http://localhost:3000';
+const DEV_URL = `http://localhost:${process.env.ELECTRON_DEV_PORT || 3000}`;
 
 // Privileged scheme registration must happen before the app is ready.
 registerMediaScheme();
