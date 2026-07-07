@@ -393,6 +393,10 @@ export class VideoFetcher {
       noCheckCertificates: true,
       preferFreeFormats: false,
       skipDownload: true,
+      // Pasted watch URLs often carry a &list= param; without this yt-dlp
+      // dumps metadata for the whole playlist (minutes) instead of the one
+      // video. The download path already passes --no-playlist.
+      noPlaylist: true,
       ...getCookieOptions(),
     });
 

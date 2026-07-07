@@ -77,6 +77,24 @@ describe('VideoFetcher', () => {
       const result = await fetcher.fetchMetadata('https://www.instagram.com/reel/exact60', 'instagram');
       expect(result.duration).toBe(3600);
     });
+
+    it('passes noPlaylist so a &list= URL fetches one video, not the playlist', async () => {
+      mockYtDlp.mockResolvedValue({
+        title: 'Single Video',
+        duration: 120,
+        thumbnail: '',
+        formats: [
+          { format_id: '22', ext: 'mp4', height: 720, width: 1280, filesize: 10000000, vcodec: 'avc1', acodec: 'mp4a' },
+        ],
+      } as never);
+
+      await fetcher.fetchMetadata('https://www.youtube.com/watch?v=abc12345678&list=PLxyz', 'youtube');
+
+      expect(mockYtDlp).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ noPlaylist: true }),
+      );
+    });
   });
 
   describe('error mapping', () => {
