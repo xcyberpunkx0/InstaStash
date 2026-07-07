@@ -1,7 +1,7 @@
 // Electron entry point: creates the window, loads the UI (next dev server in
 // development, the static export in production), and registers IPC + the media
 // protocol.
-import { app, BrowserWindow, protocol } from 'electron';
+import { app, BrowserWindow, Menu, protocol } from 'electron';
 import path from 'node:path';
 import { MEDIA_SCHEME_SPEC, handleMediaProtocol } from './media-protocol';
 import { APP_SCHEME_SPEC, APP_URL, handleAppProtocol } from './app-protocol';
@@ -13,6 +13,14 @@ const DEV_URL = `http://localhost:${process.env.ELECTRON_DEV_PORT || 3000}`;
 // Privileged scheme registration must happen before the app is ready, and
 // registerSchemesAsPrivileged may only be called once.
 protocol.registerSchemesAsPrivileged([MEDIA_SCHEME_SPEC, APP_SCHEME_SPEC]);
+
+// Drop the default File/Edit/View menu bar in production on Windows/Linux,
+// where it renders inside the window. macOS keeps its system menu bar — it
+// also provides the standard clipboard shortcuts. Dev keeps the menu for the
+// reload/devtools accelerators.
+if (!isDev && process.platform !== 'darwin') {
+  Menu.setApplicationMenu(null);
+}
 
 function createWindow(): void {
   const win = new BrowserWindow({
