@@ -119,6 +119,8 @@ export async function startDownload(wc: WebContents, input: DownloadInput): Prom
     '--newline',
     '--no-part',
     '--no-playlist',
+    // Same bot-check fallback as the metadata fetch (see video-fetcher.ts).
+    '--extractor-args', 'youtube:player_client=default,mweb',
     '--max-filesize', MAX_FILESIZE,
     '--merge-output-format', 'mp4',
     '--ffmpeg-location', getFfmpegPath(),

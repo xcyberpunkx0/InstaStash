@@ -65,6 +65,13 @@ export class VideoFetchError extends Error {
 function mapYtDlpError(errorMessage: string): { code: FetchErrorCode; message: string; retryAfter?: number } {
   const msg = errorMessage.toLowerCase();
 
+  // YouTube's anonymous-client bot check ("Sign in to confirm you're not a
+  // bot") is IP-level throttling, not private content — check it before the
+  // login/private mapping so users aren't told the video needs an account.
+  if (msg.includes('not a bot')) {
+    return { code: 'RATE_LIMITED', message: 'YouTube is temporarily blocking automated access from your network. Wait a few minutes and try again.', retryAfter: 300 };
+  }
+
   if (msg.includes('private') || msg.includes('login required') || msg.includes('sign in') || msg.includes('empty media response') || msg.includes('cookies')) {
     return { code: 'PRIVATE', message: 'This content requires login — we can only download public videos accessible without an account.' };
   }
@@ -387,7 +394,10 @@ export class VideoFetcher {
    * Uses youtube-dl-exec to call the yt-dlp binary.
    */
   private async executeYtDlp(url: string): Promise<YtDlpOutput> {
-    const result = await this.ytdlp(url, {
+    // youtube-dl-exec's Flags type is missing extractorArgs, but the runtime
+    // maps any camelCase key to its CLI flag (--extractor-args).
+    type Flags = Parameters<typeof youtubeDlExec>[1] & { extractorArgs?: string };
+    const flags: Flags = {
       dumpSingleJson: true,
       noWarnings: true,
       noCheckCertificates: true,
@@ -397,8 +407,13 @@ export class VideoFetcher {
       // dumps metadata for the whole playlist (minutes) instead of the one
       // video. The download path already passes --no-playlist.
       noPlaylist: true,
+      // YouTube bot-checks the default anonymous client on some networks;
+      // mweb still gets served, so include it as an in-request fallback.
+      // The youtube: scope means other extractors ignore this.
+      extractorArgs: 'youtube:player_client=default,mweb',
       ...getCookieOptions(),
-    });
+    };
+    const result = await this.ytdlp(url, flags);
 
     // youtube-dl-exec returns the parsed JSON when dumpSingleJson is used
     return result as unknown as YtDlpOutput;

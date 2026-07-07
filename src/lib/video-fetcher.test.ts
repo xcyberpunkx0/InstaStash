@@ -95,9 +95,42 @@ describe('VideoFetcher', () => {
         expect.objectContaining({ noPlaylist: true }),
       );
     });
+
+    it('requests the mweb fallback client for YouTube bot checks', async () => {
+      mockYtDlp.mockResolvedValue({
+        title: 'Single Video',
+        duration: 120,
+        thumbnail: '',
+        formats: [
+          { format_id: '22', ext: 'mp4', height: 720, width: 1280, filesize: 10000000, vcodec: 'avc1', acodec: 'mp4a' },
+        ],
+      } as never);
+
+      await fetcher.fetchMetadata('https://www.youtube.com/watch?v=abc12345678', 'youtube');
+
+      expect(mockYtDlp).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ extractorArgs: 'youtube:player_client=default,mweb' }),
+      );
+    });
   });
 
   describe('error mapping', () => {
+    it("maps YouTube's bot check to RATE_LIMITED, not PRIVATE", async () => {
+      mockYtDlp.mockRejectedValue(
+        new Error("Sign in to confirm you're not a bot. Use --cookies-from-browser or --cookies for the authentication."),
+      );
+
+      try {
+        await fetcher.fetchMetadata('https://www.youtube.com/watch?v=abc12345678', 'youtube');
+        expect.unreachable('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(VideoFetchError);
+        expect((e as VideoFetchError).code).toBe('RATE_LIMITED');
+        expect((e as VideoFetchError).retryAfter).toBe(300);
+      }
+    });
+
     it('should map private video errors to PRIVATE code', async () => {
       mockYtDlp.mockRejectedValue(new Error('This video is private. Sign in if you have access.'));
 
