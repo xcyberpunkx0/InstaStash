@@ -5,6 +5,7 @@ import { ipcMain, dialog, shell, type BrowserWindow } from 'electron';
 import { platformDetector, isDetectSuccess } from '@/lib/platform-detector';
 import { VideoFetcher, VideoFetchError } from '@/lib/video-fetcher';
 import { getSettings, setSettings } from '../settings';
+import { getYtDlpPath } from '../binaries';
 import { startDownload, cancelDownload } from './download';
 import { Channels, TITLEBAR_HEIGHT, type DetectResult, type FetchResult, type DownloadInput, type Settings, type TitleBarColors } from '@/shared/ipc';
 
@@ -43,7 +44,7 @@ export function registerIpc(win: BrowserWindow): void {
       return { ok: false, error: { error: 'Unsupported URL.', code: 'NETWORK_ERROR' } };
     }
     try {
-      const meta = await new VideoFetcher().fetchMetadata(detection.normalizedUrl, detection.platform);
+      const meta = await new VideoFetcher(getYtDlpPath()).fetchMetadata(detection.normalizedUrl, detection.platform);
       return { ok: true, data: meta };
     } catch (err) {
       if (err instanceof VideoFetchError) {

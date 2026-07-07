@@ -9,6 +9,11 @@ describe('resolveStaticPath', () => {
     expect(resolveStaticPath(outDir, '/')).toBe(path.join(outDir, 'index.html'));
   });
 
+  it('maps extensionless routes to their exported .html page', () => {
+    expect(resolveStaticPath(outDir, '/library')).toBe(path.join(outDir, 'library.html'));
+    expect(resolveStaticPath(outDir, '/youtube/')).toBe(path.join(outDir, 'youtube.html'));
+  });
+
   it('maps asset paths into the out directory', () => {
     expect(resolveStaticPath(outDir, '/_next/static/chunks/main.js')).toBe(
       path.join(outDir, '_next', 'static', 'chunks', 'main.js'),

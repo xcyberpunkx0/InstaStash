@@ -4,7 +4,9 @@ import path from 'node:path';
 
 /**
  * Resolve `urlPathname` to an absolute file path inside `outDir`, or null if
- * the path is malformed or escapes the directory. `/` serves index.html.
+ * the path is malformed or escapes the directory. `/` serves index.html, and
+ * extensionless routes follow the Next.js export convention: `/library` (or
+ * `/library/`) serves library.html.
  */
 export function resolveStaticPath(outDir: string, urlPathname: string): string | null {
   let decoded: string;
@@ -15,8 +17,10 @@ export function resolveStaticPath(outDir: string, urlPathname: string): string |
   }
   if (decoded.includes('\0')) return null;
 
-  const rel = decoded.replace(/^\/+/, '');
-  const abs = path.join(outDir, rel === '' ? 'index.html' : rel);
+  let rel = decoded.replace(/^\/+/, '').replace(/\/+$/, '');
+  if (rel === '') rel = 'index.html';
+  else if (path.extname(rel) === '') rel += '.html';
+  const abs = path.join(outDir, rel);
 
   // Traversal guard: the resolved path must stay inside outDir.
   const escape = path.relative(outDir, abs);

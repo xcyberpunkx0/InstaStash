@@ -1,4 +1,4 @@
-import youtubeDlExec from 'youtube-dl-exec';
+import youtubeDlExec, { create as createYtDlp } from 'youtube-dl-exec';
 import type { Platform, VideoFormat } from '@/types';
 import type { FetchErrorCode } from '@/types/errors';
 import { scrapeInstagramVideo } from './instagram-scraper';
@@ -265,6 +265,19 @@ function findPreviewUrl(rawFormats: YtDlpFormat[]): string | undefined {
 // ─── VideoFetcher Class ──────────────────────────────────────────────────────
 
 export class VideoFetcher {
+  private readonly ytdlp: typeof youtubeDlExec;
+
+  /**
+   * @param ytDlpPath Path to the yt-dlp binary to execute. Required in
+   * packaged builds: youtube-dl-exec's own binary is never shipped (its
+   * postinstall download is skipped, and node_modules lives inside app.asar
+   * where binaries can't run) — the app bundles yt-dlp under resources/bin
+   * instead. When omitted, falls back to youtube-dl-exec's default (dev).
+   */
+  constructor(ytDlpPath?: string) {
+    this.ytdlp = ytDlpPath ? (createYtDlp(ytDlpPath) as typeof youtubeDlExec) : youtubeDlExec;
+  }
+
   /**
    * Fetch video metadata from a URL using yt-dlp.
    * Returns title, duration, thumbnail, and available formats.
@@ -374,7 +387,7 @@ export class VideoFetcher {
    * Uses youtube-dl-exec to call the yt-dlp binary.
    */
   private async executeYtDlp(url: string): Promise<YtDlpOutput> {
-    const result = await youtubeDlExec(url, {
+    const result = await this.ytdlp(url, {
       dumpSingleJson: true,
       noWarnings: true,
       noCheckCertificates: true,
