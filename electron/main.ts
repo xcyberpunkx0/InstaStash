@@ -44,6 +44,9 @@ function createWindow(): void {
   }
 }
 
+// Ties taskbar grouping/pinning and notifications to the installed shortcut.
+if (process.platform === 'win32') app.setAppUserModelId('com.instastash.app');
+
 app.whenReady().then(() => {
   handleMediaProtocol();
   handleAppProtocol();
