@@ -33,6 +33,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          # Skip youtube-dl-exec's postinstall binary download: it hits the
+          # anonymous GitHub API (rate-limited on shared runner IPs) and the
+          # app bundles its own yt-dlp via fetch-binaries instead.
+          YOUTUBE_DL_SKIP_DOWNLOAD: 'true'
 
       - name: Fetch yt-dlp binary for this platform
         run: npm run fetch-binaries
