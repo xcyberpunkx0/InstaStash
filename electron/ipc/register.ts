@@ -6,7 +6,9 @@ import { platformDetector, isDetectSuccess } from '@/lib/platform-detector';
 import { VideoFetcher, VideoFetchError } from '@/lib/video-fetcher';
 import { getSettings, setSettings } from '../settings';
 import { startDownload, cancelDownload } from './download';
-import { Channels, type DetectResult, type FetchResult, type DownloadInput, type Settings } from '@/shared/ipc';
+import { Channels, TITLEBAR_HEIGHT, type DetectResult, type FetchResult, type DownloadInput, type Settings, type TitleBarColors } from '@/shared/ipc';
+
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 const SUPPORTED = ['instagram.com/reel/…', 'youtube.com/watch?v=…', 'youtu.be/…'];
 
@@ -65,4 +67,16 @@ export function registerIpc(win: BrowserWindow): void {
 
   ipcMain.handle(Channels.getSettings, () => getSettings());
   ipcMain.handle(Channels.setSettings, (_e, patch: Partial<Settings>) => setSettings(patch));
+
+  // Keeps the Windows window-controls overlay in sync with the active theme.
+  // macOS traffic lights are drawn natively and need no tinting.
+  ipcMain.on(Channels.setTitleBarColors, (_e, colors: TitleBarColors) => {
+    if (process.platform === 'darwin' || win.isDestroyed()) return;
+    if (!HEX_COLOR.test(colors?.color) || !HEX_COLOR.test(colors?.symbolColor)) return;
+    try {
+      win.setTitleBarOverlay({ color: colors.color, symbolColor: colors.symbolColor, height: TITLEBAR_HEIGHT });
+    } catch {
+      // Not supported on this platform/build — the default overlay stays.
+    }
+  });
 }

@@ -126,6 +126,74 @@ body {
 body.has-bg-lines { overflow-x: hidden; }
 
 /* ============================================================
+   DESKTOP TITLE BAR (Electron only)
+   The window is frameless with a native window-controls overlay;
+   this strip paints the title-bar band in the theme's canvas color
+   and is the drag handle. Height mirrors TITLEBAR_HEIGHT in
+   src/shared/ipc.ts via env(titlebar-area-height).
+   ============================================================ */
+.desktop-titlebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(titlebar-area-height, 36px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-canvas);
+  -webkit-app-region: drag;
+  app-region: drag;
+  user-select: none;
+  z-index: 60;
+}
+
+/* Quiet centered wordmark — the only ornament in the bar. */
+.desktop-titlebar-label {
+  font-family: var(--font-grotesk);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-400);
+  pointer-events: none;
+}
+
+/* Push the app below the strip so nothing sits under the drag region. */
+html[data-desktop] body {
+  padding-top: env(titlebar-area-height, 36px);
+}
+
+/* ============================================================
+   SCROLLBARS
+   Slim, pill-shaped, drawn in the theme's ink tones on an
+   invisible track so they melt into the canvas.
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-ink-200);
+  border-radius: 999px;
+  /* Transparent border + padding-box clip floats the pill off the edges. */
+  border: 4px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-ink-300);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ============================================================
    TYPOGRAPHY
    ============================================================ */
 h1, h2, h3 {

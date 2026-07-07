@@ -6,6 +6,7 @@ import {
   type InstaStashAPI,
   type DownloadInput,
   type Settings,
+  type TitleBarColors,
   type ProgressEvent,
   type DoneEvent,
   type ErrorEvent,
@@ -32,6 +33,7 @@ const api: InstaStashAPI = {
   revealFile: (filePath) => ipcRenderer.send(Channels.revealFile, filePath),
   getSettings: () => ipcRenderer.invoke(Channels.getSettings),
   setSettings: (patch: Partial<Settings>) => ipcRenderer.invoke(Channels.setSettings, patch),
+  setTitleBarColors: (colors: TitleBarColors) => ipcRenderer.send(Channels.setTitleBarColors, colors),
 };
 
 contextBridge.exposeInMainWorld('instastash', api);

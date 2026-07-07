@@ -6,6 +6,7 @@ import path from 'node:path';
 import { MEDIA_SCHEME_SPEC, handleMediaProtocol } from './media-protocol';
 import { APP_SCHEME_SPEC, APP_URL, handleAppProtocol } from './app-protocol';
 import { registerIpc } from './ipc/register';
+import { TITLEBAR_HEIGHT } from '@/shared/ipc';
 
 const isDev = !!process.env.ELECTRON_DEV;
 const DEV_URL = `http://localhost:${process.env.ELECTRON_DEV_PORT || 3000}`;
@@ -29,8 +30,19 @@ function createWindow(): void {
     height: 860,
     minWidth: 1281,
     minHeight: 720,
-    backgroundColor: '#EFE9E1',
+    // Matches the default Aurora theme's canvas so the first paint doesn't flash.
+    backgroundColor: '#FAFBFC',
     show: false,
+    // Frameless with native window controls overlaid on the web content, so
+    // the title bar area is painted by the UI and merges with the theme
+    // (WhatsApp-desktop style). The renderer draws a matching drag strip and
+    // re-tints the controls via IPC when the theme changes.
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#FAFBFC',
+      symbolColor: '#0F1117',
+      height: TITLEBAR_HEIGHT,
+    },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

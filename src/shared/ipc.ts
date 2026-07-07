@@ -18,6 +18,7 @@ export const Channels = {
   revealFile: 'instastash:revealFile',
   getSettings: 'instastash:getSettings',
   setSettings: 'instastash:setSettings',
+  setTitleBarColors: 'instastash:setTitleBarColors',
   // main → renderer events
   progress: 'instastash:progress',
   done: 'instastash:done',
@@ -27,6 +28,21 @@ export const Channels = {
 export interface Settings {
   /** Folder downloads are saved into. Defaults to the OS Downloads dir. */
   downloadDir: string;
+}
+
+/**
+ * Height of the frameless window's title-bar band, in px. Used for the
+ * Windows window-controls overlay; the renderer's drag strip reads the same
+ * value via env(titlebar-area-height).
+ */
+export const TITLEBAR_HEIGHT = 36;
+
+/** Theme colors for the native window-controls overlay (#rrggbb). */
+export interface TitleBarColors {
+  /** Bar background — the theme's canvas token. */
+  color: string;
+  /** Min/max/close glyph color — the theme's ink. */
+  symbolColor: string;
 }
 
 export interface DownloadInput {
@@ -90,6 +106,8 @@ export interface InstaStashAPI {
   revealFile(filePath: string): void;
   getSettings(): Promise<Settings>;
   setSettings(patch: Partial<Settings>): Promise<Settings>;
+  /** Re-tint the native window controls to match the active theme. */
+  setTitleBarColors(colors: TitleBarColors): void;
 }
 
 declare global {

@@ -8,6 +8,7 @@ import {
   JetBrains_Mono,
 } from 'next/font/google';
 import { BackgroundAnime } from '@/components/ui/BackgroundAnime';
+import { DesktopTitleBar } from '@/components/DesktopTitleBar';
 import './globals.css';
 
 // ─── Fonts (self-hosted via next/font, preloaded, no FOUT) ───────────────────
@@ -84,6 +85,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
+        <DesktopTitleBar />
         <BackgroundAnime />
         {children}
       </body>
