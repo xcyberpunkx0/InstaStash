@@ -10,12 +10,12 @@ import { fetchFromCdn, CdnUrlError } from '@/lib/safe-cdn-fetch';
 
 export const MEDIA_SCHEME = 'instastash-media';
 
-/** Must run before app.whenReady(). */
-export function registerMediaScheme(): void {
-  protocol.registerSchemesAsPrivileged([
-    { scheme: MEDIA_SCHEME, privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true } },
-  ]);
-}
+// Registered in main.ts alongside the app scheme: Electron allows only one
+// registerSchemesAsPrivileged call per process.
+export const MEDIA_SCHEME_SPEC: Electron.CustomScheme = {
+  scheme: MEDIA_SCHEME,
+  privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true },
+};
 
 /** Must run after app.whenReady(). */
 export function handleMediaProtocol(): void {

@@ -1,16 +1,18 @@
 // Electron entry point: creates the window, loads the UI (next dev server in
 // development, the static export in production), and registers IPC + the media
 // protocol.
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, protocol } from 'electron';
 import path from 'node:path';
-import { registerMediaScheme, handleMediaProtocol } from './media-protocol';
+import { MEDIA_SCHEME_SPEC, handleMediaProtocol } from './media-protocol';
+import { APP_SCHEME_SPEC, APP_URL, handleAppProtocol } from './app-protocol';
 import { registerIpc } from './ipc/register';
 
 const isDev = !!process.env.ELECTRON_DEV;
 const DEV_URL = `http://localhost:${process.env.ELECTRON_DEV_PORT || 3000}`;
 
-// Privileged scheme registration must happen before the app is ready.
-registerMediaScheme();
+// Privileged scheme registration must happen before the app is ready, and
+// registerSchemesAsPrivileged may only be called once.
+protocol.registerSchemesAsPrivileged([MEDIA_SCHEME_SPEC, APP_SCHEME_SPEC]);
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -36,13 +38,15 @@ function createWindow(): void {
     win.loadURL(DEV_URL);
     win.webContents.openDevTools({ mode: 'detach' });
   } else {
-    // Static export produced by `next build` (output: 'export') → out/index.html
-    win.loadFile(path.join(app.getAppPath(), 'out', 'index.html'));
+    // Static export produced by `next build` (output: 'export'), served over
+    // the app scheme so its root-absolute /_next/* asset URLs resolve.
+    win.loadURL(APP_URL);
   }
 }
 
 app.whenReady().then(() => {
   handleMediaProtocol();
+  handleAppProtocol();
   createWindow();
 
   app.on('activate', () => {
